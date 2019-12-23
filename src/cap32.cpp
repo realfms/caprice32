@@ -42,9 +42,11 @@
 #include <errno.h>
 #include <string.h>
 
+#ifndef NO_GUI
 #include "CapriceGui.h"
 #include "CapriceGuiView.h"
 #include "CapriceVKeyboardView.h"
+#endif
 
 #include "errors.h"
 #include "log.h"
@@ -768,7 +770,6 @@ void z80_OUT_handler (reg_pair port, byte val)
       }
    }
 }
-
 
 
 void print (byte *pbAddr, const char *pchStr, bool bolColour)
@@ -1810,6 +1811,7 @@ void cleanExit(int returnCode)
     exit(returnCode);
 }
 
+#ifndef NO_GUI
 // TODO: Deduplicate showVKeyboard and showGui
 void showVKeyboard()
 {
@@ -1841,7 +1843,6 @@ void showVKeyboard()
 }
 
 
-
 void showGui()
 {
   // Activate gui
@@ -1868,6 +1869,7 @@ void showGui()
   CPC.scr_gui_is_currently_on = false;
   audio_resume();
 }
+#endif
 
 
 
@@ -2042,18 +2044,18 @@ int cap32_main (int argc, char **argv)
                   else { // process emulator specific keys
                      switch (cpc_key) {
 
+#ifndef NO_GUI
                         case CAP32_GUI:
                           {
                             showGui();
                             break;
                           }
-
                         case CAP32_VKBD:
                           {
                             showVKeyboard();
                             break;
                           }
-
+#endif
                         case CAP32_FULLSCRN:
                            audio_pause();
                            SDL_Delay(20);
@@ -2173,6 +2175,7 @@ int cap32_main (int argc, char **argv)
             {
                 dword cpc_key = CPC.InputMapper->CPCkeyFromJoystickButton(event.jbutton);
                                 if (cpc_key == 0xff) {
+#ifndef NO_GUI
                   if (event.jbutton.button == CPC.joystick_menu_button)
                   {
                     showGui();
@@ -2181,6 +2184,7 @@ int cap32_main (int argc, char **argv)
                   {
                     showVKeyboard();
                   }
+#endif
                 }
                 applyKeypress(cpc_key, keyboard_matrix, true);
             }

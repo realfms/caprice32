@@ -13,6 +13,7 @@
 #  - LDFLAGS
 #  - WITHOUT_GL
 #  - WITH_IPF
+#  - WITHOUT_GUI
 
 # To be overridden for debian packaging
 VERSION=latest
@@ -60,6 +61,10 @@ LIBS += -ldl
 endif
 endif
 
+ifdef WITHOUT_GUI
+COMMON_CFLAGS += -DNO_GUI
+endif
+
 ifdef WITH_IPF
 COMMON_CFLAGS += -DWITH_IPF
 endif
@@ -87,8 +92,11 @@ GROFF_DOC:=doc/man6/cap32.6
 
 MAIN:=$(OBJDIR)/main.o
 
-SOURCES:=$(shell find $(SRCDIR) -name \*.cpp)
-HEADERS:=$(shell find $(SRCDIR) -name \*.h)
+ifdef WITHOUT_GUI
+EXCLUDE_PATH = -not -path "$(SRCDIR)/gui/*"
+endif
+SOURCES:=$(shell find $(SRCDIR) $(EXCLUDE_PATH) -name \*.cpp)
+HEADERS:=$(shell find $(SRCDIR) $(EXCLUDE_PATH) -name \*.h)
 DEPENDS:=$(foreach file,$(SOURCES:.cpp=.d),$(shell echo "$(OBJDIR)/$(file)"))
 OBJECTS:=$(DEPENDS:.d=.o)
 
