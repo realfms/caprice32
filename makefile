@@ -87,7 +87,7 @@ TSTDIR:=test
 OBJDIR:=obj/$(ARCH)
 OUTDIR:=output
 ARCHIVE = release/cap32-$(ARCH)
-STATICLIB = $(OUTDIR)/cap32.a
+STATICLIB = $(OUTDIR)/libcap32.a
 
 HTML_DOC:=doc/man.html
 GROFF_DOC:=doc/man6/cap32.6
