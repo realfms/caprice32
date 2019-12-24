@@ -85,6 +85,16 @@ class InputMapper;
 
 #define DEFAULT_VIDEO_PLUGIN 0
 
+#define POLL_INTERVAL_MS 1
+
+enum ApplicationWindowState
+{
+   Minimized,              // application window has been iconified
+   Restored,               // application window has been restored
+   GainedFocus,            // application window got input focus
+   LostFocus               // application window lost input focus
+};
+
 typedef struct {
    char id[8];
    char unused1[8];

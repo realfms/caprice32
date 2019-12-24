@@ -61,8 +61,6 @@
 
 #define MAX_NB_JOYSTICKS 2
 
-#define POLL_INTERVAL_MS 1
-
 extern byte bTapeLevel;
 extern t_z80regs z80;
 
@@ -195,13 +193,7 @@ t_drive driveB;
    } \
 }
 
-enum ApplicationWindowState
-{
-   Minimized,              // application window has been iconified
-   Restored,               // application window has been restored
-   GainedFocus,            // application window got input focus
-   LostFocus               // application window lost input focus
-} _appWindowState;
+ApplicationWindowState _appWindowState;
 
 CapriceArgs args;
 
