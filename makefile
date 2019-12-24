@@ -85,7 +85,9 @@ CLANG_CHECKS=modernize-*,performance-*,misc-*,-misc-definitions-in-headers,reada
 SRCDIR:=src
 TSTDIR:=test
 OBJDIR:=obj/$(ARCH)
+OUTDIR:=output
 ARCHIVE = release/cap32-$(ARCH)
+STATICLIB = $(OUTDIR)/cap32.a
 
 HTML_DOC:=doc/man.html
 GROFF_DOC:=doc/man6/cap32.6
@@ -254,6 +256,14 @@ $(OBJDIR)/$(GMOCK_DIR)/src/gmock-all.o: $(GMOCK_DIR)/src/gmock-all.cc googletest
 $(TEST_TARGET): $(OBJECTS) $(TEST_OBJECTS) $(OBJDIR)/$(GTEST_DIR)/src/gtest-all.o $(OBJDIR)/$(GMOCK_DIR)/src/gmock-all.o
 	$(CXX) $(LDFLAGS) -o $(TEST_TARGET) $(OBJDIR)/$(GTEST_DIR)/src/gtest-all.o $(OBJDIR)/$(GMOCK_DIR)/src/gmock-all.o $(TEST_OBJECTS) $(OBJECTS) $(LIBS) -lpthread
 
+$(OUTDIR):
+	@mkdir $(OUTDIR)
+
+$(STATICLIB): $(OUTDIR) $(OBJECTS)
+	@$(eval LIBOBJS := $(shell find $(OBJDIR) -name \*.o))
+	ar rvs $(STATICLIB) $(OBJECTS)
+	ranlib $(STATICLIB)
+
 ifeq ($(PLATFORM),windows)
 unit_test: $(TEST_TARGET)
 	cp $(TEST_TARGET) $(ARCHIVE)/
@@ -287,7 +297,13 @@ fix-clang-format:
 	$(CLANG_FORMAT) -style=Google -i $(SOURCES) $(TEST_SOURCES) $(HEADERS) $(TEST_HEADERS)
 
 clean:
-	rm -rf obj/ release/ .pc/
+	rm -rf obj/ release/ .pc/ $(OUTDIR)
 	rm -f test_runner test_runner.exe cap32 cap32.exe .debug tags
+
+staticlib: $(STATICLIB)
+
+withlib: $(STATICLIB) $(MAIN)
+	$(CXX) $(LDFLAGS) -o $(TARGET)-lib $(OBJECTS) $(MAIN) $(LIBS) $(STATICLIB)
+	@sed -i 's/\/usr\/local\/share\/caprice32\///g' cap32.cfg
 
 -include $(DEPENDS) $(TEST_DEPENDS)

@@ -114,3 +114,10 @@ There are many repositories for caprice32 on GitHub:
   * https://github.com/burzumishi/caprice32wx
 
 So why create another one ? All these repositories are highly inactive. The ones that touched the code added dependencies (wxWidget, GTK) without really adding features.
+
+# Compile as lib
+To compile as a lib to embbed as JNI or any other C++ lib, execute:
+
+```
+make staticlib
+```
