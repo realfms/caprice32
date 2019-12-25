@@ -65,6 +65,10 @@ ifdef WITHOUT_GUI
 COMMON_CFLAGS += -DNO_GUI
 endif
 
+ifdef WITH_FB
+COMMON_CFLAGS += -DWITH_FB
+endif
+
 ifdef WITH_IPF
 COMMON_CFLAGS += -DWITH_IPF
 endif

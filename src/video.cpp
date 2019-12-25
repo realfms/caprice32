@@ -38,6 +38,9 @@
 #endif
 #include <math.h>
 #include <iostream>
+#ifdef WITH_FB
+#include "videoext.h"
+#endif
 
 // the real video surface
 SDL_Surface* vid = nullptr;
@@ -1833,6 +1836,9 @@ video_plugin video_plugin_list[]=
 {"Dot matrix",                     dotmat_init,   dotmat_setpal,   dotmat_lock,   dotmat_unlock,   dotmat_flip,   dotmat_close,   F16_BPP,       1,         0, 0,          0, 0   },
 #ifdef HAVE_GL
 {"OpenGL scaling",                 glscale_init,  glscale_setpal,  glscale_lock,  glscale_unlock,  glscale_flip,  glscale_close,  ALL,           0,         0, 0,          0, 0   },
+#endif
+#ifdef WITH_FB
+{"Raw framebuffer",                fbpg_init,  	  fbpg_setpal,     fbpg_lock,     fbpg_unlock, 	   fbpg_flip,  	  fbpg_close,  	  ALL,           0,         0, 0,          0, 0   },
 #endif
 {nullptr,                          nullptr,       nullptr,         nullptr,       nullptr,         nullptr,       nullptr,        0,             0,         0, 0,          0, 0   }
 };
