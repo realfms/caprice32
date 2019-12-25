@@ -36,7 +36,7 @@ extern "C" {
 
 typedef void (*videocallback)(struct Cap32Screen *cpcscreen);
 
-bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps);
+bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps, char *driveA);
 void cap32ext_update();
 void cap32ext_finish();
 void video_update_callback(videocallback newcallback);

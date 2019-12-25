@@ -26,7 +26,7 @@
 
 int iExitCondition;
 
-bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps)
+bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps, char *driveA)
 {
     std::vector<std::string> slot_list;
 
@@ -59,6 +59,7 @@ bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, boo
    CPC.scr_fs_bpp = bpp;
    CPC.scr_tube = green;
    CPC.scr_fps = fps;
+   CPC.drvA_file = driveA;
 
    z80_init_tables(); // init Z80 emulation
 
