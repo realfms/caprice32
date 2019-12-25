@@ -40,6 +40,7 @@ bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, boo
 void cap32ext_update();
 void cap32ext_finish();
 void video_update_callback(videocallback newcallback);
+void cap32ext_keypress(int type, int mod, int sym);
 
 #ifdef __cplusplus
 }

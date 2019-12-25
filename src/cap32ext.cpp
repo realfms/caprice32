@@ -446,3 +446,11 @@ void video_update_callback(videocallback newcallback) {
 
 void cap32ext_finish() {
 }
+
+void cap32ext_keypress(int type, int mod, int sym) {
+    SDL_Event sdlevent = {};
+    sdlevent.type = type;
+    sdlevent.key.keysym.mod = SDLMod(mod);
+    sdlevent.key.keysym.sym = SDLKey(sym);
+    SDL_PushEvent(&sdlevent);
+}
