@@ -33,7 +33,8 @@ LOCAL_CFLAGS += \
 
 # Warnings we haven't fixed (yet)
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-sign-compare
- 
+LOCAL_CFLAGS += -DSDL_COMPAT -DNO_GUI
+
 
 LOCAL_LDLIBS := -lm
 
@@ -53,7 +54,9 @@ LOCAL_MODULE := CAP32_static
 
 LOCAL_MODULE_FILENAME := libCAP32
 
-LOCAL_LDLIBS := 
+LOCAL_CFLAGS := -DSDL_COMPAT
+
+LOCAL_LDLIBS :=
 LOCAL_EXPORT_LDLIBS := -lm
 
 include $(BUILD_STATIC_LIBRARY)
