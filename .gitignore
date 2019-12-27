@@ -17,4 +17,5 @@ debian/caprice32.substvars
 debian/caprice32/
 debian/files
 /cap32-lib
-output
+output/
+.vscode/
