@@ -97,6 +97,7 @@ HTML_DOC:=doc/man.html
 GROFF_DOC:=doc/man6/cap32.6
 
 MAIN:=$(OBJDIR)/main.o
+MAIN_LIB:=$(OBJDIR)/main_lib.o
 
 ifdef WITHOUT_GUI
 EXCLUDE_PATH = -not -path "$(SRCDIR)/gui/*"
@@ -144,6 +145,9 @@ ALL_CFLAGS=$(COMMON_CFLAGS) $(WARNINGS)
 
 $(MAIN): main.cpp src/cap32.h
 	@$(CXX) -c $(BUILD_FLAGS) $(ALL_CFLAGS) -o $(MAIN) main.cpp
+
+$(MAIN_LIB): main_lib.cpp src/cap32ext.h
+	@$(CXX) -c $(BUILD_FLAGS) $(ALL_CFLAGS) -o $(MAIN_LIB) main_lib.cpp
 
 $(DEPENDS): $(OBJDIR)/%.d: %.cpp
 	@echo Computing dependencies for $<
@@ -306,8 +310,8 @@ clean:
 
 staticlib: $(STATICLIB)
 
-withlib: $(STATICLIB) $(MAIN)
-	$(CXX) $(LDFLAGS) -o $(TARGET)-lib $(OBJECTS) $(MAIN) $(LIBS) $(STATICLIB)
+withlib: $(STATICLIB) $(MAIN_LIB)
+	$(CXX) $(LDFLAGS) -o $(TARGET)-lib $(OBJECTS) $(MAIN_LIB) $(LIBS) $(STATICLIB)
 	@sed -i 's/\/usr\/local\/share\/caprice32\///g' cap32.cfg
 
 -include $(DEPENDS) $(TEST_DEPENDS)

@@ -388,6 +388,14 @@ typedef struct {
    unsigned int frame_completed;
 } t_VDU;
 
+//SDL compatibility
+#ifdef SDL_COMPAT
+#include <SDL.h>
+typedef int SDLKey;
+typedef int SDLMod;
+typedef SDL_Keysym SDL_keysym;
+#endif
+
 // cap32.cpp
 void emulator_reset(bool bolMF2Reset);
 int  emulator_init();
