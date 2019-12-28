@@ -183,7 +183,11 @@ bool CButton::HandleMessage(CMessage* pMessage)
       {
         // Forward all key downs to parent
         CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
+#ifdef WITH_SDL2
+              pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key));
+#else
               pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key, pKeyboardMessage->Unicode));
+#endif
       }
       break;
     }

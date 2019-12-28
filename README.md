@@ -66,6 +66,17 @@ A SNAP (maintained by a third party) is available at https://snapcraft.io/capric
 Download a release from https://github.com/ColinPitrat/caprice32/releases.
 Decompress it and double click on cap32.exe
 
+## SDL versions
+
+Caprice32 supports both SDL 1.2 and SDL 2. To select which version to build, define the SDL_VERSION variable in the build command. Anything else than 2 will build using SDL 1.2.
+
+Example for build with SDL 2:
+
+```
+SDL_VERSION=2 make
+./cap32
+```
+
 # Basic usage
 
 See the [manual page](http://htmlpreview.github.io/?https://github.com/ColinPitrat/caprice32/blob/master/doc/man.html) for more details. If you are really lost, you can simply invoke the emulator without any argument, then press F1 to get the in-emulator menu.

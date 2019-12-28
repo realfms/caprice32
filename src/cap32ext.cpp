@@ -310,39 +310,57 @@ void cap32ext_update() {
         }
         break;
 
-        // Code shamelessly copied from http://sdl.beuc.net/sdl.wiki/Event_Examples
-        // TODO: What if we were paused because of other reason than losing focus and then only lost focus
-        //       the right thing to do here is to restore focus but keep paused... implementing this require
-        //       keeping track of pause source, which will be a pain.
-        case SDL_ACTIVEEVENT:
-            if (event.active.state == (SDL_APPINPUTFOCUS | SDL_APPACTIVE) ) {
-                if (event.active.gain == 0) {
-                    _appWindowState = Minimized;
-                    cpc_pause(); // Always paused when iconified
-                } else {
-                    if (_appWindowState == LostFocus ) {
-                        _appWindowState = GainedFocus;
-                        if (CPC.auto_pause)
-                        cpc_resume();
-                    } else {
-                        _appWindowState = Restored;
-                        cpc_resume(); // Always unpause when restoring from iconified
-                    }
-                }
-            }
-            else if (event.active.state & SDL_APPINPUTFOCUS) {
-                if (event.active.gain == 0) {
-                    _appWindowState = LostFocus;
-                    if (CPC.auto_pause)
+#ifdef WITH_SDL2
+            //TODO: FMS - Check this cover all cases
+            case SDL_WINDOWEVENT:
+               switch (event.window.event) {
+                  case SDL_WINDOWEVENT_FOCUS_LOST:
+                     _appWindowState = LostFocus;
+                     if (CPC.auto_pause)
                         cpc_pause();
-                }
-                else {
-                    _appWindowState = GainedFocus;
-                    if (CPC.auto_pause)
+                     break;
+                  case SDL_WINDOWEVENT_FOCUS_GAINED:
+                     _appWindowState = GainedFocus;
+                     if (CPC.auto_pause)
                         cpc_resume();
-                }
-            }
-            break;
+                     break;
+               }
+               break;
+#else
+            // Code shamelessly copied from http://sdl.beuc.net/sdl.wiki/Event_Examples
+            // TODO: What if we were paused because of other reason than losing focus and then only lost focus
+            //       the right thing to do here is to restore focus but keep paused... implementing this require
+            //       keeping track of pause source, which will be a pain.
+            case SDL_ACTIVEEVENT:
+               if (event.active.state == (SDL_APPINPUTFOCUS | SDL_APPACTIVE) ) {
+                  if (event.active.gain == 0) {
+                     _appWindowState = Minimized;
+                     cpc_pause(); // Always paused when iconified
+                  } else {
+                     if (_appWindowState == LostFocus ) {
+                         _appWindowState = GainedFocus;
+                         if (CPC.auto_pause)
+                            cpc_resume();
+                     } else {
+                         _appWindowState = Restored;
+                         cpc_resume(); // Always unpause when restoring from iconified
+                     }
+                  }
+               }
+               else if (event.active.state & SDL_APPINPUTFOCUS) {
+                  if (event.active.gain == 0) {
+                      _appWindowState = LostFocus;
+                      if (CPC.auto_pause)
+                         cpc_pause();
+                  }
+                  else {
+                      _appWindowState = GainedFocus;
+                      if (CPC.auto_pause)
+                         cpc_resume();
+                  }
+               }
+               break;
+#endif
 
         case SDL_QUIT:
             cleanExit(0);
@@ -450,7 +468,7 @@ void cap32ext_finish() {
 void cap32ext_keypress(int type, int mod, int sym) {
     SDL_Event sdlevent = {};
     sdlevent.type = type;
-    sdlevent.key.keysym.mod = SDLMod(mod);
-    sdlevent.key.keysym.sym = SDLKey(sym);
+    sdlevent.key.keysym.mod = SDL_Keymod(mod);
+    sdlevent.key.keysym.sym = SDL_Keycode(sym);
     SDL_PushEvent(&sdlevent);
 }

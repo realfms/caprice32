@@ -608,10 +608,16 @@ bool CEditBox::HandleMessage(CMessage* pMessage)
           case SDLK_ESCAPE:  // intentional fall through
           case SDLK_TAB:
             // Not for us - let parent handle it
+#ifdef WITH_SDL2
+            CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
+                  pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key));
+#else
             CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
                   pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key, pKeyboardMessage->Unicode));
+#endif
             break;
 					default:
+#ifndef WITH_SDL2
 						if (pKeyboardMessage->Unicode)
 						{
 							if ((pKeyboardMessage->Unicode & 0xFF80) == 0)
@@ -641,6 +647,7 @@ bool CEditBox::HandleMessage(CMessage* pMessage)
 								wUtil::Trace("CEditBox::HandleMessage : CEditBox can't handle Unicode characters yet.");
 							}
 						}
+#endif
 						break;
 					}
 

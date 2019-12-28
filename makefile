@@ -39,12 +39,27 @@ else
 $(error Unknown ARCH. Supported ones are linux, win32 and win64.)
 endif
 
+# Check SDL versiont o use
+ifeq ($(SDL_VERSION),2)
+WINDOWS_SDL_INCLUDE:=$(MINGW_PATH)/include/SDL2
+WINDOWS_SDL_DLL:=SDL2.dll
+SDL_CONFIG:=sdl2-config
+LIB_SDL_NAME=libsdl-2
+PKG_SDL_NAME=libsdl2-dev
+else
+WINDOWS_SDL_INCLUDE:=$(MINGW_PATH)/include/SDL
+WINDOWS_SDL_DLL:=SDL.dll
+SDL_CONFIG:=sdl-config
+LIB_SDL_NAME=libsdl-1.2
+PKG_SDL_NAME=libsdl1.2-dev
+endif
+
 ifeq ($(PLATFORM),windows)
 TARGET = cap32.exe
 TEST_TARGET = test_runner.exe
 MINGW_PATH = /usr/$(TRIPLE)
-IPATHS = -Isrc/ -Isrc/gui/includes -I$(MINGW_PATH)/include -I$(MINGW_PATH)/include/SDL -I$(MINGW_PATH)/include/freetype2
-LIBS = $(MINGW_PATH)/lib/libSDL.dll.a $(MINGW_PATH)/lib/libfreetype.dll.a $(MINGW_PATH)/lib/libz.dll.a $(MINGW_PATH)/lib/libpng16.dll.a $(MINGW_PATH)/lib/libpng.dll.a
+IPATHS = -Isrc/ -Isrc/gui/includes -I$(MINGW_PATH)/include -I$(WINDOWS_SDL_INCLUDE) -I$(MINGW_PATH)/include/freetype2
+LIBS = $(MINGW_PATH)/lib/lib$(WINDOWS_SDL_DLL).a $(MINGW_PATH)/lib/libfreetype.dll.a $(MINGW_PATH)/lib/libz.dll.a $(MINGW_PATH)/lib/libpng16.dll.a $(MINGW_PATH)/lib/libpng.dll.a
 COMMON_CFLAGS = -DWINDOWS
 CXX = $(TRIPLE)-g++
 
@@ -52,8 +67,8 @@ else
 prefix = /usr/local
 TARGET = cap32
 TEST_TARGET = test_runner
-IPATHS = -Isrc/ -Isrc/gui/includes `pkg-config --cflags freetype2` `sdl-config --cflags` `pkg-config --cflags libpng`
-LIBS = `sdl-config --libs` -lz `pkg-config --libs freetype2` `pkg-config --libs libpng`
+IPATHS = -Isrc/ -Isrc/gui/includes `pkg-config --cflags freetype2` `$(SDL_CONFIG) --cflags` `pkg-config --cflags libpng`
+LIBS = `$(SDL_CONFIG) --libs` -lz `pkg-config --libs freetype2` `pkg-config --libs libpng`
 CXX ?= g++
 COMMON_CFLAGS = -fPIC
 ifdef WITH_IPF
@@ -67,6 +82,10 @@ endif
 
 ifdef WITH_FB
 COMMON_CFLAGS += -DWITH_FB
+endif
+
+ifeq ($(SDL_VERSION),2)
+COMMON_CFLAGS += -DWITH_SDL2
 endif
 
 ifdef WITH_IPF
@@ -168,7 +187,7 @@ endif
 
 ifeq ($(PLATFORM),linux)
 check_deps:
-	@sdl-config --cflags >/dev/null 2>&1 || (echo "Error: missing dependency libsdl-1.2. Try installing libsdl 1.2 development package (e.g: libsdl1.2-dev)" && false)
+	@sdl2-config --cflags >/dev/null 2>&1 || (echo "Error: missing dependency $(LIB_SDL_NAME). Try installing libsdl development package (e.g: $(PKG_SDL_NAME))" && false)
 	@pkg-config --cflags freetype2 >/dev/null 2>&1 || (echo "Error: missing dependency libfreetype. Try installing libfreetype development package (e.g: libfreetype6-dev)" && false)
 	@pkg-config --cflags zlib >/dev/null 2>&1 || (echo "Error: missing dependency zlib. Try installing zlib development package (e.g: zlib-devel)" && false)
 	@pkg-config --cflags libpng >/dev/null 2>&1 || (echo "Error: missing dependency libpng. Try installing libpng development package (e.g: libpng-devel)" && false)
@@ -187,7 +206,7 @@ $(HTML_DOC): $(GROFF_DOC)
 
 
 ifeq ($(PLATFORM),windows)
-DLLS = SDL.dll libbz2-1.dll libfreetype-6.dll libpng16-16.dll libstdc++-6.dll \
+DLLS = $(WINDOWS_SDL_DLL) libbz2-1.dll libfreetype-6.dll libpng16-16.dll libstdc++-6.dll \
        libwinpthread-1.dll zlib1.dll libglib-2.0-0.dll libgraphite2.dll \
        libharfbuzz-0.dll libiconv-2.dll libintl-8.dll libpcre-1.dll
 

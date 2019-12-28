@@ -352,7 +352,11 @@ void CPainter::ReplaceColor(const CRGBColor& NewColor, const CRGBColor& OldColor
 
 void CPainter::TransparentColor(const CRGBColor& TransparentColor)
 {
+#ifdef WITH_SDL2
+	SDL_SetColorKey(m_pSurface, SDL_TRUE, TransparentColor.SDLColor(m_pSurface->format));
+#else
 	SDL_SetColorKey(m_pSurface, SDL_SRCCOLORKEY, TransparentColor.SDLColor(m_pSurface->format));
+#endif
 }
 
 }

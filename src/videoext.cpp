@@ -35,8 +35,6 @@ SDL_Surface *fbpg_init(video_plugin* t,int w,int h, int bpp,bool fs)
     fbvid->format->Gmask = 0xFF00;
     fbvid->format->Bmask = 0xFF;
     fbvid->format->Amask = 0x0;
-    fbvid->format->colorkey = 0;
-    fbvid->format->alpha = 0xFF;
     fbvid->w = w;
     fbvid->h = h;
     fbvid->pitch = fbvid->w * fbvid->format->BytesPerPixel;

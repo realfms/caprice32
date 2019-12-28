@@ -109,8 +109,13 @@ bool CGroupBox::HandleMessage(CMessage* pMessage)
       if (pKeyboardMessage && pMessage->Destination() == this)
       {
         // Forward all key downs to parent
+#ifdef WITH_SDL2
+        CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
+              pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key));
+#else
         CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
               pKeyboardMessage->ScanCode, pKeyboardMessage->Modifiers, pKeyboardMessage->Key, pKeyboardMessage->Unicode));
+#endif
       }
       break;
     }
