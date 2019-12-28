@@ -47,6 +47,14 @@ CSDLMessage::CSDLMessage(const EMessageType MessageType, const CMessageClient* p
 }
 
 
+#ifdef WITH_SDL2
+CKeyboardMessage::CKeyboardMessage(const EMessageType MessageType, const CMessageClient* pDestination, const CMessageClient* pSource,
+		unsigned char ScanCode, SDL_Keymod Modifiers, SDL_Keycode Key) :
+	CMessage(MessageType, pDestination, pSource),
+	ScanCode(ScanCode),
+	Modifiers(Modifiers),
+	Key(Key)
+#else
 CKeyboardMessage::CKeyboardMessage(const EMessageType MessageType, const CMessageClient* pDestination, const CMessageClient* pSource,
 		unsigned char ScanCode, SDLMod Modifiers, SDLKey Key, Uint16 Unicode) :
 	CMessage(MessageType, pDestination, pSource),
@@ -54,6 +62,7 @@ CKeyboardMessage::CKeyboardMessage(const EMessageType MessageType, const CMessag
 	Modifiers(Modifiers),
 	Key(Key),
 	Unicode(Unicode)
+#endif
 {
 
 }
@@ -84,12 +93,14 @@ unsigned int CMouseMessage::TranslateSDLButton(Uint8 SDLButton)
 	case SDL_BUTTON_MIDDLE:
 		Button = MIDDLE;
 		break;
+#ifndef WITH_SDL2
 	case SDL_BUTTON_WHEELUP:
 		Button = WHEELUP;
 		break;
 	case SDL_BUTTON_WHEELDOWN:
 		Button = WHEELDOWN;
 		break;
+#endif
 	default:
 		wUtil::Trace("Untranslated SDL Button # " + stdex::itoa(SDLButton));
 		break;

@@ -766,6 +766,7 @@ bool CTextBox::HandleMessage(CMessage* pMessage)  // virtual
 						sBuffer.insert(m_SelStart++, 1, '\n');
 						break;
 					default:
+#ifndef WITH_SDL2
 						if (pKeyboardMessage->Unicode)
 						{
 							if ((pKeyboardMessage->Unicode & 0xFF80) == 0)
@@ -779,6 +780,7 @@ bool CTextBox::HandleMessage(CMessage* pMessage)  // virtual
 								wUtil::Trace("CTextBox::HandleMessage : CTextBox can't handle Unicode characters yet.");
 							}
 						}
+#endif
 						break;
 					}
 

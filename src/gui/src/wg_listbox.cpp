@@ -380,8 +380,13 @@ bool CListBox::HandleMessage(CMessage* pMessage)
 					default:
 					{
             // Not for us - let parent handle it
+#ifdef WITH_SDL2
+            CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
+                  pKeyMsg->ScanCode, pKeyMsg->Modifiers, pKeyMsg->Key));
+#else
             CMessageServer::Instance().QueueMessage(new CKeyboardMessage(CMessage::KEYBOARD_KEYDOWN, m_pParentWindow, this,
                   pKeyMsg->ScanCode, pKeyMsg->Modifiers, pKeyMsg->Key, pKeyMsg->Unicode));
+#endif
 						bHandled=false;
 						break;
 					}

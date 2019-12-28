@@ -179,7 +179,11 @@ public:
 	//! When this is called a new SDL_MOUSEMOTION event is triggered
 	//! \param Point the position where the mouse pointer should be warped
 	virtual void SetMousePosition( const CPoint& Point )
+#ifdef WITH_SDL2
+		{ SDL_WarpMouseGlobal(stdex::safe_static_cast<Uint16>(Point.XPos()), stdex::safe_static_cast<Uint16>(Point.YPos())); }
+#else
 		{ SDL_WarpMouse(stdex::safe_static_cast<Uint16>(Point.XPos()), stdex::safe_static_cast<Uint16>(Point.YPos())); }
+#endif
 
 	//! Changes the visibility of the mouse
 	//! \param bVisible if the mouse has to be drawn or not

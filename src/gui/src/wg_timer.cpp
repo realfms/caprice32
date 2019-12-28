@@ -36,7 +36,11 @@ Uint32 TimerCallback(Uint32 Interval, void* param)
 
 
 CTimer::CTimer(CMessageClient* pOwner) :
+#ifdef WITH_SDL2
+	m_TimerID(0),
+#else
 	m_TimerID(nullptr),
+#endif
 	m_bAutoRestart(false),
 	m_iCounter(0),
 	m_pOwner(pOwner)
@@ -52,7 +56,11 @@ CTimer::~CTimer()
 void CTimer::StartTimer(unsigned long int Interval, bool bAutoRestart)
 {
 	m_bAutoRestart = bAutoRestart;
+#ifdef WITH_SDL2
+	if (m_TimerID != 0)
+#else
 	if (m_TimerID != nullptr)
+#endif
 	{
 		StopTimer();
 	}
@@ -65,7 +73,11 @@ void CTimer::StopTimer()
 	if (m_TimerID)
 	{
 		SDL_RemoveTimer(m_TimerID);
+#ifdef WITH_SDL2
+		m_TimerID = 0;
+#else
 		m_TimerID = nullptr;
+#endif
 	}
 }
 
