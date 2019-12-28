@@ -661,6 +661,18 @@ std::map<unsigned int, unsigned int> InputMapper::SDLkeysymFromCPCkeys_us = {
   { CPC_EQUAL,       SDLK_EQUALS },
   { CPC_ESC,         SDLK_ESCAPE },
   { CPC_EXCLAMATN,   SDLK_1 | MOD_PC_SHIFT },
+#ifdef WITH_SDL2
+  { CPC_F0,          SDLK_KP_0 },
+  { CPC_F1,          SDLK_KP_1 },
+  { CPC_F2,          SDLK_KP_2 },
+  { CPC_F3,          SDLK_KP_3 },
+  { CPC_F4,          SDLK_KP_4 },
+  { CPC_F5,          SDLK_KP_5 },
+  { CPC_F6,          SDLK_KP_6 },
+  { CPC_F7,          SDLK_KP_7 },
+  { CPC_F8,          SDLK_KP_8 },
+  { CPC_F9,          SDLK_KP_9 },
+#else
   { CPC_F0,          SDLK_KP0 },
   { CPC_F1,          SDLK_KP1 },
   { CPC_F2,          SDLK_KP2 },
@@ -671,6 +683,7 @@ std::map<unsigned int, unsigned int> InputMapper::SDLkeysymFromCPCkeys_us = {
   { CPC_F7,          SDLK_KP7 },
   { CPC_F8,          SDLK_KP8 },
   { CPC_F9,          SDLK_KP9 },
+#endif
   { CPC_FPERIOD,     SDLK_KP_PERIOD },
   { CPC_GREATER,     SDLK_PERIOD | MOD_PC_SHIFT },
   { CPC_HASH,        SDLK_3 | MOD_PC_SHIFT },
@@ -711,8 +724,13 @@ std::map<unsigned int, unsigned int> InputMapper::SDLkeysymFromCPCkeys_us = {
   { CAP32_SPEED,     SDLK_F9 },
   { CAP32_DEBUG,     SDLK_F12 },
   { CAP32_TAPEPLAY,  SDLK_F4 },
+#ifdef WITH_SDL2
+  { CAP32_DELAY,     SDLK_PAUSE },
+  { CAP32_WAITBREAK, SDLK_PAUSE | MOD_PC_SHIFT }
+#else
   { CAP32_DELAY,     SDLK_BREAK },
   { CAP32_WAITBREAK, SDLK_BREAK | MOD_PC_SHIFT }
+#endif
 };
 
 const std::map<const std::string, const unsigned int> InputMapper::CPCkeysFromStrings = {
@@ -956,6 +974,7 @@ const std::map<const std::string, const unsigned int> InputMapper::SDLkeysFromSt
 	{ "SDLK_DELETE", SDLK_DELETE},
 	/* End of ASCII mapped keysyms */
 	/*@}*/
+#ifndef WITH_SDL2
 		/** @name International keyboard syms */
 	/*@{*/
 	{ "SDLK_WORLD_0", SDLK_WORLD_0},		/* 0xA0 */
@@ -1055,8 +1074,21 @@ const std::map<const std::string, const unsigned int> InputMapper::SDLkeysFromSt
 	{ "SDLK_WORLD_94", SDLK_WORLD_94},
 	{ "SDLK_WORLD_95", SDLK_WORLD_95},		/* 0xFF */
 	/*@}*/
+#endif
 		/** @name Numeric keypad */
 	/*@{*/
+#ifdef WITH_SDL2
+	{ "SDLK_KP0", SDLK_KP_0},
+	{ "SDLK_KP1", SDLK_KP_1},
+	{ "SDLK_KP2", SDLK_KP_2},
+	{ "SDLK_KP3", SDLK_KP_3},
+	{ "SDLK_KP4", SDLK_KP_4},
+	{ "SDLK_KP5", SDLK_KP_5},
+	{ "SDLK_KP6", SDLK_KP_6},
+	{ "SDLK_KP7", SDLK_KP_7},
+	{ "SDLK_KP8", SDLK_KP_8},
+	{ "SDLK_KP9", SDLK_KP_9},
+#else
 	{ "SDLK_KP0", SDLK_KP0},
 	{ "SDLK_KP1", SDLK_KP1},
 	{ "SDLK_KP2", SDLK_KP2},
@@ -1067,6 +1099,7 @@ const std::map<const std::string, const unsigned int> InputMapper::SDLkeysFromSt
 	{ "SDLK_KP7", SDLK_KP7},
 	{ "SDLK_KP8", SDLK_KP8},
 	{ "SDLK_KP9", SDLK_KP9},
+#endif
 	{ "SDLK_KP_PERIOD", SDLK_KP_PERIOD},
 	{ "SDLK_KP_DIVIDE", SDLK_KP_DIVIDE},
 	{ "SDLK_KP_MULTIPLY", SDLK_KP_MULTIPLY},
@@ -1107,37 +1140,68 @@ const std::map<const std::string, const unsigned int> InputMapper::SDLkeysFromSt
 	/*@}*/
 		/** @name Key state modifier keys */
 	/*@{*/
+#ifdef WITH_SDL2
+	{ "SDLK_NUMLOCK", SDLK_NUMLOCKCLEAR},
+#else
 	{ "SDLK_NUMLOCK", SDLK_NUMLOCK},
+#endif
 	{ "SDLK_CAPSLOCK", SDLK_CAPSLOCK},
+#ifdef WITH_SDL2
+	{ "SDLK_SCROLLOCK", SDLK_SCROLLLOCK},
+#else
 	{ "SDLK_SCROLLOCK", SDLK_SCROLLOCK},
+#endif
 	{ "SDLK_RSHIFT", SDLK_RSHIFT},
 	{ "SDLK_LSHIFT", SDLK_LSHIFT},
 	{ "SDLK_RCTRL", SDLK_RCTRL},
 	{ "SDLK_LCTRL", SDLK_LCTRL},
 	{ "SDLK_RALT", SDLK_RALT},
 	{ "SDLK_LALT", SDLK_LALT},
+#ifdef WITH_SDL2
+	{ "SDLK_RMETA", SDLK_RGUI},
+	{ "SDLK_LMETA", SDLK_LGUI},
+#else
 	{ "SDLK_RMETA", SDLK_RMETA},
 	{ "SDLK_LMETA", SDLK_LMETA},
 	{ "SDLK_LSUPER", SDLK_LSUPER},		/**< Left "Windows" key */
 	{ "SDLK_RSUPER", SDLK_RSUPER},		/**< Right "Windows" key */
+#endif
 	{ "SDLK_MODE", SDLK_MODE},		/**< "Alt Gr" key */
+#ifdef WITH_SDL2
+	{ "SDLK_COMPOSE", SDLK_APPLICATION},		/**< Multi-key compose key */
+#else
 	{ "SDLK_COMPOSE", SDLK_COMPOSE},		/**< Multi-key compose key */
+#endif
 	/*@}*/
 		/** @name Miscellaneous function keys */
 	/*@{*/
 	{ "SDLK_HELP", SDLK_HELP},
+#ifdef WITH_SDL2
+	{ "SDLK_PRINT", SDLK_PRINTSCREEN},
+#else
 	{ "SDLK_PRINT", SDLK_PRINT},
+#endif
 	{ "SDLK_SYSREQ", SDLK_SYSREQ},
+#ifdef WITH_SDL2
+	{ "SDLK_BREAK", SDLK_PAUSE},
+#else
 	{ "SDLK_BREAK", SDLK_BREAK},
+#endif
 	{ "SDLK_MENU", SDLK_MENU},
 	{ "SDLK_POWER", SDLK_POWER},		/**< Power Macintosh power key */
+#ifndef WITH_SDL2
 	{ "SDLK_EURO", SDLK_EURO},		/**< Some european keyboards */
+#endif
 	{ "SDLK_UNDO", SDLK_UNDO},		/**< Atari keyboard has Undo */
        /*@}*/
 	{ "MOD_PC_SHIFT", MOD_PC_SHIFT},
 	{ "MOD_PC_CTRL", MOD_PC_CTRL},
 	{ "MOD_PC_MODE", MOD_PC_MODE},
+#ifdef WITH_SDL2
+	{ "MOD_PC_GUI", MOD_PC_GUI},
+#else
 	{ "MOD_PC_META", MOD_PC_META},
+#endif
 	{ "MOD_PC_ALT", MOD_PC_ALT}
 };
 
@@ -1208,18 +1272,30 @@ void InputMapper::init()
   for (const auto &mapping : CPCkeysFromChars) {
     if (SDLkeysymFromCPCkeys.count(mapping.second) != 0) {
       sdl_moddedkey = SDLkeysymFromCPCkeys[mapping.second];
+#ifdef WITH_SDL2
+      SDLkeysFromChars[mapping.first] = std::make_pair(static_cast<SDL_Keycode>(sdl_moddedkey & 0xffff), static_cast<SDL_Keymod>(sdl_moddedkey >> 16));
+#else
       SDLkeysFromChars[mapping.first] = std::make_pair(static_cast<SDLKey>(sdl_moddedkey & 0xffff), static_cast<SDLMod>(sdl_moddedkey >> 16));
+#endif
     }
   }
 }
 
+#ifdef WITH_SDL2
+dword InputMapper::CPCkeyFromKeysym(SDL_Keysym keysym) {
+#else
 dword InputMapper::CPCkeyFromKeysym(SDL_keysym keysym) {
+#endif
     dword sdl_key = keysym.sym;
 
     if (keysym.mod & KMOD_SHIFT)  sdl_key |= MOD_PC_SHIFT;
     if (keysym.mod & KMOD_CTRL)   sdl_key |= MOD_PC_CTRL;
     if (keysym.mod & KMOD_MODE)   sdl_key |= MOD_PC_MODE;
+#ifdef WITH_SDL2
+    if (keysym.mod & KMOD_GUI)   sdl_key |= MOD_PC_GUI;
+#else
     if (keysym.mod & KMOD_META)   sdl_key |= MOD_PC_META;
+#endif
     if (keysym.mod & KMOD_ALT)    sdl_key |= MOD_PC_ALT;
     // Ignore sticky modifiers (MOD_PC_NUM and MOD_PC_CAPS)
 
@@ -1258,8 +1334,13 @@ std::list<SDL_Event> InputMapper::StringToEvents(std::string toTranslate) {
         // Lookup the SDL key corresponding to this emulator command
         sdl_keysym = SDLkeysymFromCPCkeys.find(keycode);
         if (sdl_keysym != SDLkeysymFromCPCkeys.end()) {
+#ifdef WITH_SDL2
+          key.key.keysym.sym = static_cast<SDL_Keycode>(sdl_keysym->second & 0xffff);
+          key.key.keysym.mod = static_cast<SDL_Keymod>(sdl_keysym->second >> 16);
+#else
           key.key.keysym.sym = static_cast<SDLKey>(sdl_keysym->second & 0xffff);
           key.key.keysym.mod = static_cast<SDLMod>(sdl_keysym->second >> 16);
+#endif
         }
         escaped = false;
         cap32_cmd = false;

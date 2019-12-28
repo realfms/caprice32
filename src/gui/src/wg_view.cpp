@@ -138,7 +138,9 @@ void CView::AttachMenu(CMenu* pMenu)
 void CView::SetWindowText(const std::string& sText)
 {
 	CWindow::SetWindowText(sText);
+#ifndef WITH_SDL2
 	SDL_WM_SetCaption(m_sWindowText.c_str(), "");
+#endif
 }
 
 
@@ -147,6 +149,7 @@ void CView::SetWindowRect(const CRect& WindowRect)
 	CWindow::SetWindowRect(WindowRect);
 	m_ClientRect = CRect(0, 0, m_WindowRect.Width(), m_WindowRect.Height());
 
+#ifndef WITH_SDL2
 	Uint32 iFlags = SDL_SWSURFACE | SDL_ANYFORMAT ;
 	if (m_bResizable && !m_bFullScreen)
 	{
@@ -161,6 +164,7 @@ void CView::SetWindowRect(const CRect& WindowRect)
 	m_pScreenSurface = SDL_SetVideoMode(m_WindowRect.Width(), m_WindowRect.Height(), CApplication::Instance()->GetBitsPerPixel(), iFlags);
 	if (m_pScreenSurface == nullptr)
 		throw( Wg_Ex_SDL(std::string("Could not set video mode: ") + SDL_GetError(), "CView::SetWindowRect") );
+#endif
 }
 
 
@@ -221,6 +225,7 @@ bool CView::HandleMessage(CMessage* pMessage)
 			break;
 		case CMessage::CTRL_RESIZE:
 		{
+#ifndef WITH_SDL2
 			TPointMessage* pResizeMessage = dynamic_cast<TPointMessage*>(pMessage);
 			if (pResizeMessage && pResizeMessage->Source() == CApplication::Instance())
 			{
@@ -240,6 +245,7 @@ bool CView::HandleMessage(CMessage* pMessage)
 
 				bHandled = true;
 			}
+#endif
 			break;
 		}
 		case CMessage::MOUSE_BUTTONDOWN:

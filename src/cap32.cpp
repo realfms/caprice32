@@ -1461,7 +1461,9 @@ int video_init ()
 
    SDL_ShowCursor(SDL_DISABLE); // hide the mouse cursor
 
+#ifndef WITH_SDL2
    SDL_WM_SetCaption("Caprice32 " VERSION_STRING, "Caprice32");
+#endif
 
    crtc_init();
 
@@ -2205,6 +2207,23 @@ int cap32_main (int argc, char **argv)
             }
             break;
 
+#ifdef WITH_SDL2
+            //TODO: FMS - Check this cover all cases
+            case SDL_WINDOWEVENT:
+               switch (event.window.event) {
+                  case SDL_WINDOWEVENT_FOCUS_LOST:
+                     _appWindowState = LostFocus;
+                     if (CPC.auto_pause)
+                        cpc_pause();
+                     break;
+                  case SDL_WINDOWEVENT_FOCUS_GAINED:
+                     _appWindowState = GainedFocus;
+                     if (CPC.auto_pause)
+                        cpc_resume();
+                     break;
+               }
+               break;
+#else
             // Code shamelessly copied from http://sdl.beuc.net/sdl.wiki/Event_Examples
             // TODO: What if we were paused because of other reason than losing focus and then only lost focus
             //       the right thing to do here is to restore focus but keep paused... implementing this require
@@ -2238,6 +2257,7 @@ int cap32_main (int argc, char **argv)
                   }
                }
                break;
+#endif
 
             case SDL_QUIT:
                cleanExit(0);

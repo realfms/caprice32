@@ -140,14 +140,26 @@ public:
 	//! \param ScanCode The scan code of the key pressed
 	//! \param Modifiers Any modifier keys that are being pressed (alt, ctrl, shift, etc)
 	//! \param Key The SDLKey that defines the key pressed
+#ifndef WITH_SDL2
 	//! \param Unicode The unicode character the keypress corresponds to
+#endif
+#ifdef WITH_SDL2
+	CKeyboardMessage(const EMessageType MessageType, const CMessageClient* pDestination, const CMessageClient* pSource,
+		unsigned char ScanCode, SDL_Keymod Modifiers, SDL_Keycode Key);
+#else
 	CKeyboardMessage(const EMessageType MessageType, const CMessageClient* pDestination, const CMessageClient* pSource,
 		unsigned char ScanCode, SDLMod Modifiers, SDLKey Key, Uint16 Unicode);
+#endif
 
 	unsigned char ScanCode;  //!< The scan code of the key pressed
+#ifdef WITH_SDL2
+	SDL_Keymod Modifiers;  //!< Any modifier keys that are being pressed (alt, ctrl, shift, etc)
+	SDL_Keycode Key;  //!< The SDLKey that defines the key pressed
+#else
 	SDLMod Modifiers;  //!< Any modifier keys that are being pressed (alt, ctrl, shift, etc)
 	SDLKey Key;  //!< The SDLKey that defines the key pressed
 	Uint16 Unicode;  //!< The unicode character the keypress corresponds to
+#endif
 };
 
 

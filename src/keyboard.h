@@ -19,6 +19,10 @@
 #define MOD_PC_NUM      (KMOD_NUM << 16)
 #define MOD_PC_CAPS     (KMOD_CAPS << 16)
 
+#ifdef WITH_SDL2
+#define MOD_PC_GUI     (KMOD_GUI << 16)
+#endif
+
 typedef enum {
    CAP32_EXIT = MOD_EMU_KEY,
    CAP32_FPS,
@@ -200,7 +204,11 @@ class InputMapper {
 		static const std::map<const std::string, const unsigned int> CPCkeysFromStrings;
 		static const std::map<const std::string, const unsigned int> SDLkeysFromStrings;
 		static const std::map<const char, const CPC_KEYS> CPCkeysFromChars;
+#ifdef WITH_SDL2
+		std::map<char, std::pair<SDL_Keycode, SDL_Keymod>> SDLkeysFromChars;
+#else
 		std::map<char, std::pair<SDLKey, SDLMod>> SDLkeysFromChars;
+#endif
 		static std::map<unsigned int, unsigned int> SDLkeysymFromCPCkeys_us;
 		std::map<unsigned int, unsigned int> CPCkeysFromSDLkeysym;
 		std::map<unsigned int, unsigned int> SDLkeysymFromCPCkeys;
@@ -211,7 +219,11 @@ class InputMapper {
 	public:
 		InputMapper(t_CPC *CPC);
 		void init();
+#ifdef WITH_SDL2
+		dword CPCkeyFromKeysym(SDL_Keysym keysym);
+#else
 		dword CPCkeyFromKeysym(SDL_keysym keysym);
+#endif
 		dword CPCkeyFromJoystickButton(SDL_JoyButtonEvent jbutton);
 		void CPCkeyFromJoystickAxis(SDL_JoyAxisEvent jaxis, dword *cpc_key, bool &release);
 		std::list<SDL_Event> StringToEvents(std::string toTranslate);
