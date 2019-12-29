@@ -111,8 +111,13 @@ dword breakPointsToSkipBeforeProceedingWithVirtualEvents = 0;
 
 byte *membank_config[8][4];
 
+#ifdef WITH_SDL2
+SDL_RWops *pfileObject;
+SDL_RWops *pfoPrinter;
+#else
 FILE *pfileObject;
 FILE *pfoPrinter;
+#endif
 
 #ifdef DEBUG
 dword dwDebugFlag = 0;
@@ -671,7 +676,13 @@ void z80_OUT_handler (reg_pair port, byte val)
       CPC.printer_port = val ^ 0x80; // invert bit 7
       if (pfoPrinter) {
          if (!(CPC.printer_port & 0x80)) { // only grab data bytes; ignore the strobe signal
+            #ifdef WITH_SDL2
+            unsigned char c = (unsigned char) CPC.printer_port;
+            SDL_RWwrite(pfoPrinter, &c, 1, 1); // capture printer output to file
+            #else
             fputc(CPC.printer_port, pfoPrinter); // capture printer output to file
+            #endif
+            
          }
       }
    }
@@ -904,6 +915,19 @@ int emulator_patch_ROM ()
 
    if(CPC.model <= 2) { // Normal CPC range
       std::string romFilename = CPC.rom_path + "/" + chROMFile[CPC.model];
+
+      #ifdef WITH_SDL2
+      if ((pfileObject = SDL_RWFromFile(romFilename.c_str(), "rb")) != nullptr) { // load CPC OS + Basic
+         if(SDL_RWread(pfileObject, pbROM, 2*16384, 1) != 1) {
+            SDL_RWclose(pfileObject);
+            LOG_ERROR("Couldn't read ROM file '" << romFilename << "'");
+            return ERR_NOT_A_CPC_ROM;
+         }
+      } else {
+         LOG_ERROR("Couldn't open ROM file '" << romFilename << "'");
+         return ERR_CPC_ROM_MISSING;
+      }
+      #else
       if ((pfileObject = fopen(romFilename.c_str(), "rb")) != nullptr) { // load CPC OS + Basic
          if(fread(pbROM, 2*16384, 1, pfileObject) != 1) {
             fclose(pfileObject);
@@ -916,6 +940,7 @@ int emulator_patch_ROM ()
          LOG_ERROR("Couldn't open ROM file '" << romFilename << "'");
          return ERR_CPC_ROM_MISSING;
       }
+      #endif
    } else { // Plus range
       if (pbCartridgePages[0] != nullptr) {
          pbROMlo = pbCartridgePages[0];
@@ -1072,6 +1097,40 @@ int emulator_init ()
          pchRomData = new byte [16384]; // allocate 16K
          memset(pchRomData, 0, 16384); // clear memory
          std::string romFilename = CPC.rom_path + "/" + CPC.rom_file[iRomNum];
+         #ifdef WITH_SDL2
+         if ((pfileObject = SDL_RWFromFile(romFilename.c_str(), "rb")) != nullptr) { // attempt to open the ROM image
+            if(SDL_RWread(pfileObject, pchRomData, 128, 1) != 1) { // read 128 bytes of ROM data
+              SDL_RWclose(pfileObject);
+              return ERR_NOT_A_CPC_ROM;
+            }
+            word checksum = 0;
+            for (int n = 0; n < 0x43; n++) {
+               checksum += pchRomData[n];
+            }
+            if (checksum == ((pchRomData[0x43] << 8) + pchRomData[0x44])) { // if the checksum matches, we got us an AMSDOS header
+               if(SDL_RWread(pfileObject, pchRomData, 128, 1) != 1) { // skip it
+                 SDL_RWclose(pfileObject);
+                 return ERR_NOT_A_CPC_ROM;
+               }
+            }
+            if (!(pchRomData[0] & 0xfc)) { // is it a valid CPC ROM image (0 = forground, 1 = background, 2 = extension)?
+               if(SDL_RWread(pfileObject, pchRomData+128, 16384-128, 1) != 1) { // read the rest of the ROM file
+                 SDL_RWclose(pfileObject);
+                 return ERR_NOT_A_CPC_ROM;
+               }
+               memmap_ROM[iRomNum] = pchRomData; // update the ROM map
+            } else { // not a valid ROM file
+               fprintf(stderr, "ERROR: %s is not a CPC ROM file - clearing ROM slot %d.\n", CPC.rom_file[iRomNum].c_str(), iRomNum);
+               delete [] pchRomData; // free memory on error
+               CPC.rom_file[iRomNum] = "";
+            }
+            SDL_RWclose(pfileObject);
+         } else { // file not found
+            fprintf(stderr, "ERROR: The %s file is missing - clearing ROM slot %d.\n", CPC.rom_file[iRomNum].c_str(), iRomNum);
+            delete [] pchRomData; // free memory on error
+            CPC.rom_file[iRomNum] = "";
+         }
+         #else
          if ((pfileObject = fopen(romFilename.c_str(), "rb")) != nullptr) { // attempt to open the ROM image
             if(fread(pchRomData, 128, 1, pfileObject) != 1) { // read 128 bytes of ROM data
               fclose(pfileObject);
@@ -1104,6 +1163,7 @@ int emulator_init ()
             delete [] pchRomData; // free memory on error
             CPC.rom_file[iRomNum] = "";
          }
+         #endif
       }
    }
    if (CPC.mf2) { // Multiface 2 enabled?
@@ -1116,6 +1176,18 @@ int emulator_init ()
          memset(pbMF2ROM, 0, 16384); // clear memory
          std::string romFilename = CPC.rom_path + "/" + CPC.rom_mf2;
          bool MF2error = false;
+         #ifdef WITH_SDL2
+         if ((pfileObject = SDL_RWFromFile(romFilename.c_str(), "rb")) != nullptr) { // attempt to open the ROM image
+            if((SDL_RWread(pfileObject,pbMF2ROMbackup, 8192, 1) != 1) || (memcmp(pbMF2ROMbackup+0x0d32, "MULTIFACE 2", 11) != 0)) { // does it have the required signature?
+               fprintf(stderr, "ERROR: The file selected as the MF2 ROM is either corrupt or invalid.\n");
+               MF2error = true;
+            }
+            SDL_RWclose(pfileObject);
+         } else { // error opening file
+            fprintf(stderr, "ERROR: The file selected as the MF2 ROM (%s) couldn't be opened.\n", romFilename.c_str());
+            MF2error = true;
+         }
+         #else
          if ((pfileObject = fopen(romFilename.c_str(), "rb")) != nullptr) { // attempt to open the ROM image
             if((fread(pbMF2ROMbackup, 8192, 1, pfileObject) != 1) || (memcmp(pbMF2ROMbackup+0x0d32, "MULTIFACE 2", 11) != 0)) { // does it have the required signature?
                fprintf(stderr, "ERROR: The file selected as the MF2 ROM is either corrupt or invalid.\n");
@@ -1126,6 +1198,7 @@ int emulator_init ()
             fprintf(stderr, "ERROR: The file selected as the MF2 ROM (%s) couldn't be opened.\n", romFilename.c_str());
             MF2error = true;
          }
+         #endif
          if(MF2error) {
            delete [] pbMF2ROMbackup;
            delete [] pbMF2ROM;
@@ -1169,9 +1242,15 @@ void emulator_shutdown ()
 int printer_start ()
 {
    if (!pfoPrinter) {
+      #ifdef WITH_SDL2
+      if(!(pfoPrinter = SDL_RWFromFile(CPC.printer_file.c_str(), "wb"))) {
+         return 0; // failed to open/create file
+      }
+      #else
       if(!(pfoPrinter = fopen(CPC.printer_file.c_str(), "wb"))) {
          return 0; // failed to open/create file
       }
+      #endif
    }
    return 1; // ready to capture printer output
 }
@@ -1181,7 +1260,11 @@ int printer_start ()
 void printer_stop ()
 {
    if (pfoPrinter) {
+      #ifdef WITH_SDL2
+      SDL_RWclose(pfoPrinter);
+      #else
       fclose(pfoPrinter);
+      #endif
    }
    pfoPrinter = nullptr;
 }
@@ -1695,11 +1778,19 @@ void loadConfiguration (t_CPC &CPC, const std::string& configFilename)
       sprintf(chRomId, "slot%02d", iRomNum); // build ROM ID
       CPC.rom_file[iRomNum] = conf.getStringValue("rom", chRomId, "");
    }
+   #ifdef WITH_SDL2
+   if ((pfileObject = SDL_RWFromFile(chFileName, "rt")) == nullptr) {
+      CPC.rom_file[7] = "amsdos.rom"; // insert AMSDOS in slot 7 if the config file does not exist yet
+   } else {
+      SDL_RWclose(pfileObject);
+   }
+   #else
    if ((pfileObject = fopen(chFileName, "rt")) == nullptr) {
       CPC.rom_file[7] = "amsdos.rom"; // insert AMSDOS in slot 7 if the config file does not exist yet
    } else {
       fclose(pfileObject);
    }
+   #endif
    CPC.rom_mf2 = conf.getStringValue("rom", "rom_mf2", "");
 
    CPC.cart_file = CPC.rom_path + "/system.cpr"; // Only default path defined. Needed for CPC6128+
