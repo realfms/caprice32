@@ -6,7 +6,14 @@
 extern bool log_verbose;
 
 #ifdef _ANDROID_LOG_
-    #define LOG_TO(level,message) __android_log_write(level, "Caprice32", message)
+    #include <android/log.h>
+    #include <sstream>
+
+    #define LOG_TO(level,message) { \
+        std::stringstream sLog; \
+        sLog << (level) << " " << __FILE__ << ":" << __LINE__ << " - " << message << std::endl; \
+        __android_log_write(level, "Caprice32", sLog.str().c_str()); \
+    }
 
     #define LOG_ERROR(message) LOG_TO(ANDROID_LOG_ERROR, message)
     #define LOG_WARNING(message) LOG_TO(ANDROID_LOG_WARNING, message)
