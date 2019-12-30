@@ -780,22 +780,44 @@ void frame_finished()
 
 void prerender_border()
 {
+#ifdef _PRERENDER_BORDER_WORD_ALIGN_
+   word wVal = 0x1010;
+   *((word *)RendPos) = wVal;
+   *(((word *)RendPos)+1) = wVal;
+   *(((word *)RendPos)+2) = wVal;
+   *(((word *)RendPos)+3) = wVal;
+   *(((word *)RendPos)+4) = wVal;
+   *(((word *)RendPos)+5) = wVal;
+   *(((word *)RendPos)+6) = wVal;
+   *(((word *)RendPos)+7) = wVal;
+   RendPos += 4;
+#else
    dword dwVal = 0x10101010;
    *RendPos = dwVal;
    *(RendPos + 1) = dwVal;
    *(RendPos + 2) = dwVal;
    *(RendPos + 3) = dwVal;
    RendPos += 4;
+#endif
 }
 
 
 
 void prerender_border_half()
 {
+#ifdef _PRERENDER_BORDER_WORD_ALIGN_
+   word wVal = 0x1010;
+   *((word *)RendPos) = wVal;
+   *(((word *)RendPos)+1) = wVal;
+   *(((word *)RendPos)+2) = wVal;
+   *(((word *)RendPos)+3) = wVal;
+   RendPos += 2;
+#else
    dword dwVal = 0x10101010;
    *RendPos = dwVal;
    *(RendPos + 1) = dwVal;
    RendPos += 2;
+#endif
 }
 
 
