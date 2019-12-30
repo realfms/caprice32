@@ -67,7 +67,8 @@ byte PosShift, HorzChar, HorzMax;
 dword *ModeMaps[4];
 dword *ModeMap;
 byte HorzPix[49];
-byte RendBuff[800];
+dword AlignedBuffer[800/sizeof(dword)]; //Ensure dword alignment for buffer to avoid crashin in some ARM devices
+byte *RendBuff = (byte *) AlignedBuffer;
 byte *RendWid, *RendOut;
 dword *RendStart, *RendPos;
 
