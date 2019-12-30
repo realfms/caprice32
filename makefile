@@ -165,8 +165,8 @@ ALL_CFLAGS=$(COMMON_CFLAGS) $(WARNINGS)
 $(MAIN): main.cpp src/cap32.h
 	@$(CXX) -c $(BUILD_FLAGS) $(ALL_CFLAGS) -o $(MAIN) main.cpp
 
-$(MAIN_LIB): main_lib.cpp src/cap32ext.h
-	@$(CXX) -c $(BUILD_FLAGS) $(ALL_CFLAGS) -o $(MAIN_LIB) main_lib.cpp
+$(MAIN_LIB): main_lib.c src/cap32ext.h
+	@$(CXX) -c $(BUILD_FLAGS) $(ALL_CFLAGS) -o $(MAIN_LIB) main_lib.c
 
 $(DEPENDS): $(OBJDIR)/%.d: %.cpp
 	@echo Computing dependencies for $<
