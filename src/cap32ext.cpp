@@ -26,7 +26,7 @@
 
 int iExitCondition;
 
-bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps, char *driveA)
+bool cap32ext_init(bool loadConfig)
 {
     std::vector<std::string> slot_list;
 
@@ -44,22 +44,15 @@ bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, boo
       strncpy(chAppPath,APP_PATH,_MAX_PATH);
    #endif
 
-   loadConfiguration(CPC, getConfigurationFilename()); // retrieve the emulator configuration
+   if (loadConfig) {
+    loadConfiguration(CPC, getConfigurationFilename()); // retrieve the emulator configuration
+   }
+
    if (CPC.printer) {
       if (!printer_start()) { // start capturing printer output, if enabled
          CPC.printer = 0;
       }
    }
-
-   //Fill from values
-   CPC.model = model;
-   CPC.scr_style = scr_style;
-   CPC.scr_fs_width = width;
-   CPC.scr_fs_height = height;
-   CPC.scr_fs_bpp = bpp;
-   CPC.scr_tube = green;
-   CPC.scr_fps = fps;
-   CPC.drvA_file = driveA;
 
    z80_init_tables(); // init Z80 emulation
 
@@ -471,4 +464,102 @@ void cap32ext_keypress(int type, int mod, int sym) {
     sdlevent.key.keysym.mod = SDL_Keymod(mod);
     sdlevent.key.keysym.sym = SDL_Keycode(sym);
     SDL_PushEvent(&sdlevent);
+}
+
+void cap32ext_checFinalConfig() {
+   if (CPC.model > 3) {
+      CPC.model = 2;
+   }
+   if (CPC.ram_size > 576) {
+      CPC.ram_size = 576;
+   } else if ((CPC.model >= 2) && (CPC.ram_size < 128)) {
+      CPC.ram_size = 128; // minimum RAM size for CPC 6128 is 128KB
+   }
+   if ((CPC.speed < MIN_SPEED_SETTING) || (CPC.speed > MAX_SPEED_SETTING)) {
+      CPC.speed = DEF_SPEED_SETTING;
+   }
+   if (CPC.keyboard > MAX_ROM_MODS) {
+      CPC.keyboard = 0;
+   }
+   CPC.joystick_menu_button -= 1;
+   CPC.joystick_vkeyboard_button -= 1;
+   if (CPC.scr_style >= nb_video_plugins) {
+      CPC.scr_style = DEFAULT_VIDEO_PLUGIN;
+      LOG_ERROR("Unsupported video plugin specified - defaulting to plugin " << video_plugin_list[DEFAULT_VIDEO_PLUGIN].name);
+   }
+   if (CPC.scr_oglscanlines > 100) {
+      CPC.scr_oglscanlines = 30;
+   }
+   if ((CPC.scr_intensity < 5) || (CPC.scr_intensity > 15)) {
+      CPC.scr_intensity = 10;
+   }
+   if (CPC.snd_playback_rate > (MAX_FREQ_ENTRIES-1)) {
+      CPC.snd_playback_rate = 2;
+   }
+   if (CPC.snd_volume > 100) {
+      CPC.snd_volume = 80;
+   }
+}
+
+void cap32ext_loadCPCDefaults() {
+   CPC.model = 2; // CPC 6128
+   CPC.jumpers = 0x1e; // OEM is Amstrad, video refresh is 50Hz
+   CPC.ram_size = 128; // 128KB RAM
+   CPC.speed = DEF_SPEED_SETTING; // original CPC speed
+   CPC.limit_speed = 1;
+   CPC.auto_pause = 1;
+   CPC.boot_time = 5;
+   CPC.printer = 0;
+   CPC.mf2 = 0;
+   CPC.keyboard = 0;
+   CPC.joystick_emulation = 0;
+   CPC.joysticks = 1;
+   CPC.joystick_menu_button = 9;
+   CPC.joystick_vkeyboard_button = 10;
+   CPC.resources_path = "resources";
+   CPC.scr_fs_width = 800;
+   CPC.scr_fs_height = 600;
+   CPC.scr_fs_bpp = 8;
+   CPC.scr_style = 0;
+   CPC.scr_oglfilter = 1;
+   CPC.scr_oglscanlines = 30;
+
+   CPC.scr_led = 1;
+   CPC.scr_fps = 0;
+   CPC.scr_tube = 0;
+   CPC.scr_intensity = 10;
+   CPC.scr_remanency = 0;
+   CPC.scr_window = 1;
+
+   CPC.snd_enabled = 1;
+   CPC.snd_playback_rate = 2;
+   CPC.snd_bits = 1;
+   CPC.snd_stereo = 1;
+   CPC.snd_volume = 80;
+   CPC.snd_pp_device = 0;
+
+   CPC.kbd_layout = "keymap_us.map";
+
+   CPC.max_tracksize = 6144-154;
+   CPC.current_snap_path =
+   CPC.snap_path = "snap";
+   CPC.current_cart_path =
+   CPC.cart_path = "cart";
+   CPC.current_dsk_path =
+   CPC.dsk_path = "disk";
+   CPC.current_tape_path =
+   CPC.tape_path = "tape";
+
+   CPC.printer_file = "printer.dat";
+   CPC.sdump_dir = "screenshots";
+
+   CPC.rom_path = "rom";
+   for (int iRomNum = 0; iRomNum < 16; iRomNum++) { // loop for ROMs 0-15
+      char chRomId[14];
+      sprintf(chRomId, "slot%02d", iRomNum); // build ROM ID
+      CPC.rom_file[iRomNum] = "";
+   }
+   CPC.rom_file[7] = "amsdos.rom";  //Insert amsdos in slot 7
+   CPC.rom_mf2 = "";
+   CPC.cart_file = CPC.rom_path + "/system.cpr"; // Only default path defined. Needed for CPC6128+
 }
