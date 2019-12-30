@@ -46,7 +46,7 @@ bool cap32ext_init(bool loadConfig);
 void cap32ext_update();
 void cap32ext_finish();
 void video_update_callback(videocallback newcallback);
-void cap32ext_keypress(int type, int mod, int sym);
+bool cap32ext_sendevent(SDL_Event e);
 void cap32ext_loadCPCDefaults();
 void cap32ext_checFinalConfig();
 

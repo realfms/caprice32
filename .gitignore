@@ -19,3 +19,5 @@ debian/files
 /cap32-lib
 output/
 .vscode/
+disk/
+
