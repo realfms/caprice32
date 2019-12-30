@@ -28,6 +28,12 @@
 #include "z80.h"
 #include "argparse.h"
 
+#define MIN_SPEED_SETTING 2
+#define MAX_SPEED_SETTING 32
+#define DEF_SPEED_SETTING 4
+#define MAX_ROM_MODS 2
+#define MAX_FREQ_ENTRIES 5
+
 #ifdef __cplusplus
 // extern "C" is needed so the C++ compiler exports the symbols without name
 // manging.
@@ -36,11 +42,13 @@ extern "C" {
 
 typedef void (*videocallback)(struct Cap32Screen *cpcscreen);
 
-bool cap32ext_init(int model, int scr_style, int width, int height, int bpp, bool green, bool fps, char *driveA);
+bool cap32ext_init(bool loadConfig);
 void cap32ext_update();
 void cap32ext_finish();
 void video_update_callback(videocallback newcallback);
 void cap32ext_keypress(int type, int mod, int sym);
+void cap32ext_loadCPCDefaults();
+void cap32ext_checFinalConfig();
 
 #ifdef __cplusplus
 }
