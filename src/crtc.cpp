@@ -790,7 +790,7 @@ void prerender_border()
    *(((word *)RendPos)+5) = wVal;
    *(((word *)RendPos)+6) = wVal;
    *(((word *)RendPos)+7) = wVal;
-   RendPos += 4;
+   RendPos += 4;  //Important, as RendPost is a dword this forwards 16 bytes
 #else
    dword dwVal = 0x10101010;
    *RendPos = dwVal;
@@ -824,22 +824,44 @@ void prerender_border_half()
 
 void prerender_sync()
 {
+#ifdef _PRERENDER_BORDER_WORD_ALIGN_
+   word dwVal = 0x1111;
+   *((word *)RendPos) = wVal;
+   *(((word *)RendPos)+1) = wVal;
+   *(((word *)RendPos)+2) = wVal;
+   *(((word *)RendPos)+3) = wVal;
+   *(((word *)RendPos)+4) = wVal;
+   *(((word *)RendPos)+5) = wVal;
+   *(((word *)RendPos)+6) = wVal;
+   *(((word *)RendPos)+7) = wVal;
+   RendPos += 4;  //Important, as RendPost is a dword this forwards 16 bytes
+#else
    dword dwVal = 0x11111111;
    *RendPos = dwVal;
    *(RendPos + 1) = dwVal;
    *(RendPos + 2) = dwVal;
    *(RendPos + 3) = dwVal;
    RendPos += 4;
+#endif
 }
 
 
 
 void prerender_sync_half()
 {
+#ifdef _PRERENDER_BORDER_WORD_ALIGN_
+   word wVal = 0x1111;
+   *((word *)RendPos) = wVal;
+   *(((word *)RendPos)+1) = wVal;
+   *(((word *)RendPos)+2) = wVal;
+   *(((word *)RendPos)+3) = wVal;
+   RendPos += 2;
+#else
    dword dwVal = 0x11111111;
    *RendPos = dwVal;
    *(RendPos + 1) = dwVal;
    RendPos += 2;
+#endif
 }
 
 
