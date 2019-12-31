@@ -121,7 +121,11 @@ namespace zip
     LOG_DEBUG("Using temporary file: " << tmpFilePath);
     *pfileOut = fopen(tmpFilePath, "w+b");
 #else
+    #ifdef _ANDROID_
+    *pfileOut = getAndroidTmpFile();
+    #else
     *pfileOut = tmpfile();
+    #endif
 #endif
     if (*pfileOut == nullptr) {
       LOG_ERROR("Couldn't unzip file: Couldn't create temporary file: " << strerror(errno));

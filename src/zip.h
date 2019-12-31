@@ -21,4 +21,7 @@ namespace zip
   int extract (const t_zip_info& zi, FILE **pfileOut);
 }
 
+#ifdef _ANDROID_
+FILE *getAndroidTmpFile();
+#endif
 #endif

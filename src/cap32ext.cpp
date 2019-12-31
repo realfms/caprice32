@@ -25,15 +25,18 @@
 #include <thread>
 
 int iExitCondition;
+std::string tmpPath;
 
-bool cap32ext_init(bool loadConfig)
+
+bool cap32ext_init(bool loadConfig, std::string tmpFolder)
 {
     std::vector<std::string> slot_list;
 
-    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0) { // initialize SDL
+   if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0) { // initialize SDL
       fprintf(stderr, "SDL_Init() failed: %s\n", SDL_GetError());
       return false;
    }
+   tmpPath = tmpFolder;
 
    #ifndef APP_PATH
    if(getcwd(chAppPath, sizeof(chAppPath)-1) == nullptr) {
@@ -553,3 +556,26 @@ void cap32ext_loadCPCDefaults() {
    CPC.rom_mf2 = "";
    CPC.cart_file = CPC.rom_path + "/system.cpr"; // Only default path defined. Needed for CPC6128+
 }
+
+#ifdef _ANDROID_
+FILE *getAndroidTmpFile() {
+    FILE * handle = nullptr;
+
+    std::string path = tmpPath + "/cpc-dsk-tmp";
+
+    LOG_INFO("Creating tmp file in:" + path);
+    int descriptor = mkstemp(&path[0]);
+    if (-1 != descriptor) {
+        handle = fdopen(descriptor, "w+b");
+        if (nullptr == handle) {
+            LOG_ERROR("Error converting file");
+            close(descriptor);
+        }
+
+        // File already open,
+        // can be unbound from the file system
+        std::remove(path.c_str());
+    }
+    return handle;
+}
+#endif

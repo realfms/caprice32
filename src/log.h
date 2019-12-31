@@ -5,7 +5,7 @@
 
 extern bool log_verbose;
 
-#ifdef _ANDROID_LOG_
+#ifdef _ANDROID_
     #include <android/log.h>
     #include <sstream>
 

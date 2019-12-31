@@ -42,7 +42,7 @@ extern "C" {
 
 typedef void (*videocallback)(struct Cap32Screen *cpcscreen);
 
-bool cap32ext_init(bool loadConfig);
+bool cap32ext_init(bool loadConfig, std::string folder);
 void cap32ext_update();
 void cap32ext_finish();
 void video_update_callback(videocallback newcallback);
