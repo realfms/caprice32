@@ -825,7 +825,7 @@ void prerender_border_half()
 void prerender_sync()
 {
 #ifdef _PRERENDER_BORDER_WORD_ALIGN_
-   word dwVal = 0x1111;
+   word wVal = 0x1111;
    *((word *)RendPos) = wVal;
    *(((word *)RendPos)+1) = wVal;
    *(((word *)RendPos)+2) = wVal;
