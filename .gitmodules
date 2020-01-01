@@ -1,0 +1,6 @@
+[submodule "src/cpcfs"]
+	path = src/cpcfs
+	url = https://github.com/realfms/cpcfs.git
+[submodule "cpcfs"]
+	path = cpcfs
+	url = https://github.com/realfms/cpcfs.git

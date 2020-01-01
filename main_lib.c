@@ -1,4 +1,4 @@
-#include "cap32ext.h"
+#include <cap32ext.h>
 
 int main(int argc, char **argv)
 {
@@ -14,25 +14,27 @@ int main(int argc, char **argv)
   CPC.scr_fs_bpp = 32;
   CPC.scr_tube = false;
   CPC.scr_fps = false;
-  CPC.drvA_file = "disk/BatmanForever.zip";
+  CPC.drvA_file = "disk/BatmanForever.dsk";
   CPC.kbd_layout = "keymap_es_linux.map";
   CPC.keyboard = 2;
   cap32ext_checFinalConfig();
 
   //Init emulator
-  cap32ext_init(false);
+  cap32ext_init(false, ".");
 
   while (doWork) {
     if (SDL_PollEvent(&event)) {
-      fprintf(stderr, "Received event %X\n", event.type);
       switch (event.type)
       {
       case SDL_QUIT:
-         cleanExit(0);
-
+         doWork = false;
+         break;
+      case SDL_KEYDOWN:
+          if (event.key.keysym.scancode == SDL_SCANCODE_F1) {
+            break;
+          }
       default:
         doWork = cap32ext_sendevent(event);
-
         break;
       }
     }

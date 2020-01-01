@@ -23,6 +23,9 @@
 #include "asic.h"
 #include <chrono>
 #include <thread>
+extern "C" {
+#include <cpcdir.h>
+}
 
 int iExitCondition;
 std::string tmpPath;
@@ -30,7 +33,8 @@ std::string tmpPath;
 
 bool cap32ext_init(bool loadConfig, std::string tmpFolder)
 {
-    std::vector<std::string> slot_list;
+   std::vector<std::string> slot_list;
+   char *imageName = NULL, *foundAutoload = NULL;
 
    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0) { // initialize SDL
       fprintf(stderr, "SDL_Init() failed: %s\n", SDL_GetError());
@@ -97,6 +101,16 @@ bool cap32ext_init(bool loadConfig, std::string tmpFolder)
    // Really load the various drives, if needed
    loadSlots();
 
+   //Prepare autoload if drive A is loaded
+   imageName = strdup(CPC.drvA_file.c_str());
+   foundAutoload = cap32ext_autoload(imageName);
+   free(imageName);
+
+   if (foundAutoload != NULL) {
+      args.autocmd += replaceCap32Keys(foundAutoload);
+      args.autocmd += "\n";
+   }
+
    // Fill the buffer with autocmd if provided
    virtualKeyboardEvents = CPC.InputMapper->StringToEvents(args.autocmd);
    // Give some time to the CPC to start before sending any command
@@ -117,6 +131,34 @@ videocallback videocb = NULL;
 struct Cap32Screen cpcscreen = Cap32Screen{};
 
 void cap32ext_update() {
+    if(!virtualKeyboardEvents.empty()
+        && (nextVirtualEventFrameCount < dwFrameCountOverall)
+        && (breakPointsToSkipBeforeProceedingWithVirtualEvents == 0)) {
+
+        auto nextVirtualEvent = &virtualKeyboardEvents.front();
+        SDL_PushEvent(nextVirtualEvent);
+        
+        auto keysym = nextVirtualEvent->key.keysym;
+        LOG_DEBUG("Inserted virtual event keysym=" << int(keysym.sym));
+        
+        dword cpc_key = CPC.InputMapper->CPCkeyFromKeysym(keysym);
+        if (!(cpc_key & MOD_EMU_KEY)) {
+        LOG_DEBUG("The virtual event is a keypress (not a command), so introduce a pause.");
+        // Setting nextVirtualEventFrameCount below guarantees to
+        // immediately break the loop enclosing this code and wait
+        // at least one frame.
+        // FMS: This was in the original, changed to do always the wait
+        //   nextVirtualEventFrameCount = dwFrameCountOverall
+        //    + ((event.type == SDL_KEYDOWN)?1:0);
+        // The extra delay in case of SDL_KEYDOWN is to keep the
+        // key pressed long enough.  If we don't do this, the CPC
+        // firmware debouncer eats repeated characters.
+        nextVirtualEventFrameCount = dwFrameCountOverall+1;
+        }
+
+        virtualKeyboardEvents.pop_front();
+    }
+
     if (!CPC.paused) { // run the emulation, as long as the user doesn't pause it
       dwTicks = SDL_GetTicks();
       if (dwTicks >= dwTicksTargetFPS) { // update FPS counter?
@@ -217,32 +259,6 @@ void cap32ext_finish() {
 }
 
 bool cap32ext_sendevent(SDL_Event event) {
-    if(!virtualKeyboardEvents.empty()
-        && (nextVirtualEventFrameCount < dwFrameCountOverall)
-        && (breakPointsToSkipBeforeProceedingWithVirtualEvents == 0)) {
-
-        auto nextVirtualEvent = &virtualKeyboardEvents.front();
-        SDL_PushEvent(nextVirtualEvent);
-        
-        auto keysym = nextVirtualEvent->key.keysym;
-        LOG_DEBUG("Inserted virtual event keysym=" << int(keysym.sym));
-        
-        dword cpc_key = CPC.InputMapper->CPCkeyFromKeysym(keysym);
-        if (!(cpc_key & MOD_EMU_KEY)) {
-        LOG_DEBUG("The virtual event is a keypress (not a command), so introduce a pause.");
-        // Setting nextVirtualEventFrameCount below guarantees to
-        // immediately break the loop enclosing this code and wait
-        // at least one frame.
-        nextVirtualEventFrameCount = dwFrameCountOverall
-            + ((event.type == SDL_KEYDOWN)?1:0);
-        // The extra delay in case of SDL_KEYDOWN is to keep the
-        // key pressed long enough.  If we don't do this, the CPC
-        // firmware debouncer eats repeated characters.
-        }
-
-        virtualKeyboardEvents.pop_front();
-    }
-    
    switch (event.type) {
       case SDL_KEYDOWN:
          {
@@ -501,7 +517,7 @@ void cap32ext_loadCPCDefaults() {
    CPC.speed = DEF_SPEED_SETTING; // original CPC speed
    CPC.limit_speed = 1;
    CPC.auto_pause = 1;
-   CPC.boot_time = 5;
+   CPC.boot_time = 42;
    CPC.printer = 0;
    CPC.mf2 = 0;
    CPC.keyboard = 0;
@@ -555,6 +571,50 @@ void cap32ext_loadCPCDefaults() {
    CPC.rom_file[7] = "amsdos.rom";  //Insert amsdos in slot 7
    CPC.rom_mf2 = "";
    CPC.cart_file = CPC.rom_path + "/system.cpr"; // Only default path defined. Needed for CPC6128+
+}
+
+char *cap32ext_autoload(char *imageName) {
+   int nFiles = 0;
+   int index, cur_name_id, first_bas, first_spc, first_bin;
+   bool found;
+   static char buffer[200];
+   char *retVal = NULL;
+
+   cpcfs_init();
+   //TODO: FMS - Open image will not work if disk image IS compressed
+   if (open_image(imageName) == 0) {
+      nFiles = cpcfs_getNfiles();
+      first_bas = first_spc = first_bin = -1;
+      for (index = 0; index < nFiles; index++) {
+         char* scan = strchr(cpcfs_fileName(index), '.');
+         if (scan) {
+            if (! strcasecmp(scan+1, "BAS")) {
+               if (first_bas == -1) first_bas = index;
+               found = true;
+         } else if (! strcasecmp(scan+1, "")) {
+            if (first_spc == -1) first_spc = index;
+            found = true;
+         } else 
+         if (! strcasecmp(scan+1, "BIN")) {
+            if (first_bin == -1) first_bin = index;
+            found = true;
+            }
+         }
+      }
+
+      if (found) {
+         if (first_bas != -1) cur_name_id = first_bas;
+         else  if (first_spc != -1) cur_name_id = first_spc;
+         else  if (first_bin != -1) cur_name_id = first_bin;
+      
+         sprintf(buffer, "RUN\"%s", cpcfs_fileName(cur_name_id));
+         retVal = buffer;
+      };
+      close_image();
+   }
+
+   cpcfs_finish();
+   return retVal;
 }
 
 #ifdef _ANDROID_

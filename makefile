@@ -59,7 +59,7 @@ TARGET = cap32.exe
 TEST_TARGET = test_runner.exe
 MINGW_PATH = /usr/$(TRIPLE)
 IPATHS = -Isrc/ -Isrc/gui/includes -I$(MINGW_PATH)/include -I$(WINDOWS_SDL_INCLUDE) -I$(MINGW_PATH)/include/freetype2
-LIBS = $(MINGW_PATH)/lib/lib$(WINDOWS_SDL_DLL).a $(MINGW_PATH)/lib/libfreetype.dll.a $(MINGW_PATH)/lib/libz.dll.a $(MINGW_PATH)/lib/libpng16.dll.a $(MINGW_PATH)/lib/libpng.dll.a
+LIBS = $(MINGW_PATH)/lib/lib$(WINDOWS_SDL_DLL).a $(MINGW_PATH)/lib/libfreetype.dll.a $(MINGW_PATH)/lib/libz.dll.a $(MINGW_PATH)/lib/libpng16.dll.a $(MINGW_PATH)/lib/libpng.dll.a $(MINGW_PATH)/lib/libcpcfs.a
 COMMON_CFLAGS = -DWINDOWS
 CXX = $(TRIPLE)-g++
 
@@ -68,7 +68,7 @@ prefix = /usr/local
 TARGET = cap32
 TEST_TARGET = test_runner
 IPATHS = -Isrc/ -Isrc/gui/includes `pkg-config --cflags freetype2` `$(SDL_CONFIG) --cflags` `pkg-config --cflags libpng`
-LIBS = `$(SDL_CONFIG) --libs` -lz `pkg-config --libs freetype2` `pkg-config --libs libpng`
+LIBS = `$(SDL_CONFIG) --libs` -lz `pkg-config --libs freetype2` `pkg-config --libs libpng` -lcpcfs
 CXX ?= g++
 COMMON_CFLAGS = -fPIC
 ifdef WITH_IPF
@@ -100,6 +100,8 @@ endif
 ifdef APP_PATH
 COMMON_CFLAGS += -DAPP_PATH=\"$(APP_PATH)\"
 endif
+
+LDFLAGS += -Lcpcfs/output
 
 CLANG_FORMAT=clang-format
 CLANG_TIDY=clang-tidy-3.8

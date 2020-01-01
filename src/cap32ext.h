@@ -49,6 +49,7 @@ void video_update_callback(videocallback newcallback);
 bool cap32ext_sendevent(SDL_Event e);
 void cap32ext_loadCPCDefaults();
 void cap32ext_checFinalConfig();
+char *cap32ext_autoload(char *imageName);
 
 #ifdef __cplusplus
 }
