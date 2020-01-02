@@ -15,7 +15,11 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/src $(LOCAL_PATH)/../SDL2/include $(LOCAL_PATH
 LOCAL_SRC_FILES := \
 	$(subst $(LOCAL_PATH)/,, \
 	$(wildcard $(LOCAL_PATH)/src/*.cpp) \
-	$(wildcard $(LOCAL_PATH)/src/*.c))
+	$(wildcard $(LOCAL_PATH)/src/*.c) \
+	$(LOCAL_PATH)/cpcfs/src/fs.c \
+	$(LOCAL_PATH)/cpcfs/src/tools.c \
+	$(LOCAL_PATH)/cpcfs/src/match.c \
+	$(LOCAL_PATH)/cpcfs/src/cpcfs.c)
 
 LOCAL_CFLAGS += \
 	-Wall -Wextra \
@@ -31,7 +35,7 @@ LOCAL_CFLAGS += \
 
 # Warnings we haven't fixed (yet)
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-sign-compare
-LOCAL_CFLAGS += -DSDL_COMPAT -DNO_GUI -DWITH_SDL2 -D_ANDROID_ -D_PRERENDER_BORDER_WORD_ALIGN_
+LOCAL_CFLAGS += -DSDL_COMPAT -DNO_GUI -DWITH_SDL2 -D_ANDROID_ -D_PRERENDER_BORDER_WORD_ALIGN_ -D_LIBRARY_ -DUSE_READLINE=0 -DLINUX=1
 LOCAL_SHARED_LIBRARIES := SDL2 PNG
 
 LOCAL_LDLIBS := -lm -lz -llog

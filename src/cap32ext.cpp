@@ -30,6 +30,11 @@ extern "C" {
 int iExitCondition;
 std::string tmpPath;
 
+void cap32ext_stringToEvents(std::string cmd, unsigned int delay) {
+   virtualKeyboardEvents = CPC.InputMapper->StringToEvents(cmd);
+   // Give some time to the CPC to start before sending any command
+   nextVirtualEventFrameCount = dwFrameCountOverall + delay;
+}
 
 bool cap32ext_init(bool loadConfig, std::string tmpFolder)
 {
@@ -111,10 +116,8 @@ bool cap32ext_init(bool loadConfig, std::string tmpFolder)
       args.autocmd += "\n";
    }
 
-   // Fill the buffer with autocmd if provided
-   virtualKeyboardEvents = CPC.InputMapper->StringToEvents(args.autocmd);
-   // Give some time to the CPC to start before sending any command
-   nextVirtualEventFrameCount = dwFrameCountOverall + CPC.boot_time;
+   // Fill the buffer with autocmd if provided and give enough time to CPC boot
+   cap32ext_stringToEvents(args.autocmd, CPC.boot_time);
 
 // ----------------------------------------------------------------------------
 

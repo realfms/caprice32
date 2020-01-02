@@ -50,6 +50,7 @@ bool cap32ext_sendevent(SDL_Event e);
 void cap32ext_loadCPCDefaults();
 void cap32ext_checFinalConfig();
 char *cap32ext_autoload(char *imageName);
+void cap32ext_stringToEvents(std::string cmd, unsigned int delay);
 
 #ifdef __cplusplus
 }
