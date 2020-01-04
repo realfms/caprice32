@@ -42,6 +42,10 @@ SDL_Renderer *renderer = nullptr;
 SDL_Texture *texture = nullptr;
 SDL_Palette *palette = nullptr;
 
+//Callback
+typedef void (*renderercallback)(SDL_Window *cpcwindow, SDL_Renderer *renderer);
+renderercallback rendercb = nullptr;
+
 // the real video surface
 SDL_Surface* vid = nullptr;
 // the video surface shown by the plugin to the application
@@ -176,6 +180,12 @@ static void compute_rects(SDL_Rect* src, SDL_Rect* dst)
 	}
 }
 
+void call_render_callback() {
+    if (rendercb != nullptr) {
+        rendercb(window, renderer);
+    }
+}
+
 /* ------------------------------------------------------------------------------------ */
 /* Half size video plugin ------------------------------------------------------------- */
 /* ------------------------------------------------------------------------------------ */
@@ -237,7 +247,8 @@ void half_flip()
 	SDL_UpdateTexture(texture, NULL, vid->pixels, vid->pitch);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);}
+    call_render_callback();
+    SDL_RenderPresent(renderer);}
 
 void half_close()
 {
@@ -288,6 +299,7 @@ void halfhw_flip()
   CAP32_SDL2_UPDATETEXTURE(vid);
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, NULL, NULL);
+  call_render_callback();
   SDL_RenderPresent(renderer);
 }
 
@@ -312,7 +324,7 @@ SDL_Surface* double_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, CPC_VISIBLE_SCR_WIDTH*2, CPC_VISIBLE_SCR_HEIGHT*2);
-		
+
 	if (fs)
 	{
 		t->x_scale=1.0;
@@ -357,6 +369,7 @@ void double_flip()
 	SDL_UpdateTexture(texture, NULL, vid->pixels, vid->pitch);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 
@@ -411,6 +424,7 @@ void doublehw_flip()
   CAP32_SDL2_UPDATETEXTURE(vid);
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, NULL, NULL);
+  call_render_callback();
   SDL_RenderPresent(renderer);
 }
 
@@ -743,6 +757,7 @@ void seagle_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);}
 
 void seagle_close()
@@ -855,6 +870,7 @@ void scale2x_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 
@@ -1130,6 +1146,7 @@ void ascale2x_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 
@@ -1242,7 +1259,8 @@ void tv2x_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
+    call_render_callback();
+    SDL_RenderPresent(renderer);
 }
 
 void tv2x_close()
@@ -1350,6 +1368,7 @@ void swbilin_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 
@@ -1505,6 +1524,7 @@ void swbicub_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 
@@ -1622,6 +1642,7 @@ void dotmat_flip()
 		SDL_UnlockSurface(vid);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+    call_render_callback();
 	SDL_RenderPresent(renderer);
 }
 

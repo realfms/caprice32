@@ -258,7 +258,7 @@ void video_update_callback(videocallback newcallback) {
 }
 
 void cap32ext_finish() {
-   cleanExit(0);
+    doCleanUp();
 }
 
 bool cap32ext_sendevent(SDL_Event event) {
@@ -620,6 +620,44 @@ char *cap32ext_autoload(char *imageName) {
    return retVal;
 }
 
+void cap32ext_cpcpause() {
+    cpc_pause();
+}
+
+void cap32ext_cpcresume() {
+    cpc_resume();
+}
+
+void cap32ext_cpcreset(bool bolMF2Reset) {
+    emulator_reset(bolMF2Reset);
+}
+
+void emulator_shutdown ();
+
+void cap32ext_cpchardreset() {
+    emulator_shutdown();
+    emulator_init();
+}
+
+void cap32ext_cpcvideoreset() {
+    audio_pause();
+    SDL_Delay(20);
+    video_shutdown();
+    if (video_init()) {
+        LOG_ERROR("video_init() failed. This could render emulator unusable.");
+    }
+    audio_resume();
+
+}
+
+extern renderercallback rendercb;
+
+renderercallback cap32ext_setrenderercallback(renderercallback cb) {
+   renderercallback oldRendercb = rendercb;
+   rendercb = cb;
+   return oldRendercb;
+}
+
 #ifdef _ANDROID_
 FILE *getAndroidTmpFile() {
     FILE * handle = nullptr;
@@ -627,17 +665,14 @@ FILE *getAndroidTmpFile() {
     std::string path = tmpPath + "/cpc-dsk-tmp";
 
     LOG_INFO("Creating tmp file in:" + path);
-    int descriptor = mkstemp(&path[0]);
-    if (-1 != descriptor) {
-        handle = fdopen(descriptor, "w+b");
-        if (nullptr == handle) {
-            LOG_ERROR("Error converting file");
-            close(descriptor);
-        }
-
+    handle = fopen(path.c_str(), "w+b");
+    if (handle != NULL) {
         // File already open,
         // can be unbound from the file system
         std::remove(path.c_str());
+    } else {
+        LOG_ERROR("Error creating file");
+        LOG_ERROR("Could not generate tmp file in path:" + path);
     }
     return handle;
 }

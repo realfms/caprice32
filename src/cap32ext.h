@@ -41,6 +41,8 @@ extern "C" {
 #endif
 
 typedef void (*videocallback)(struct Cap32Screen *cpcscreen);
+typedef void (*renderercallback)(SDL_Window *cpcwindow, SDL_Renderer *renderer);
+renderercallback cap32ext_setrenderercallback(renderercallback cb);
 
 bool cap32ext_init(bool loadConfig, std::string folder);
 void cap32ext_update();
@@ -51,6 +53,11 @@ void cap32ext_loadCPCDefaults();
 void cap32ext_checFinalConfig();
 char *cap32ext_autoload(char *imageName);
 void cap32ext_stringToEvents(std::string cmd, unsigned int delay);
+void cap32ext_cpcpause();
+void cap32ext_cpcresume();
+void cap32ext_cpcreset(bool bolMF2Reset);
+void cap32ext_cpchardreset();
+void cap32ext_cpcvideoreset();
 
 #ifdef __cplusplus
 }
@@ -107,5 +114,6 @@ extern void cpc_resume();
 extern void print (byte *pbAddr, const char *pchStr, bool bolColour);
 extern void video_display ();
 extern void dumpScreen();
+extern void doCleanUp();
 
 #endif
