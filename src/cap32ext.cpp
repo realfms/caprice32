@@ -21,6 +21,8 @@
 #include "log.h"
 #include "tape.h"
 #include "asic.h"
+#include "fileutils.h"
+#include "savepng.h"
 #include <chrono>
 #include <thread>
 extern "C" {
@@ -647,6 +649,32 @@ void cap32ext_cpcvideoreset() {
     }
     audio_resume();
 
+}
+
+void cap32ext_dumpsnap() {
+    std::string dir = CPC.snap_path;
+    std::string snapName = "snap_" + getDateString();
+
+    if (!is_directory(dir)) {
+        LOG_ERROR("Unable to find or open directory " + CPC.snap_path + " when trying to take a machine snapshot. Defaulting to current directory.")
+        return;
+    }
+    LOG_INFO("Dumping screen to " + snapName);
+    if (SDL_SavePNG(back_surface, dir + "/" + snapName + ".png")) {
+        LOG_ERROR("Could not write screenshot file to " + snapName);
+    }
+
+    LOG_DEBUG("Dumping machine snapshot to " + dumpPath);
+    if (snapshot_save(dir + "/" + snapName + ".sna")) {
+        LOG_DEBUG("Could not write machine snapshot to " + snapName);
+    }
+    else {
+        set_osd_message("Captured machine snapshot to " + snapName);
+    }
+}
+
+int cap32ext_loadsnap(std::string filename) {
+    return snapshot_load(filename);
 }
 
 extern renderercallback rendercb;
