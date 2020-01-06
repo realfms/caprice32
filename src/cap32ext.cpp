@@ -106,19 +106,6 @@ bool cap32ext_init(bool loadConfig, std::string tmpFolder)
    // Really load the various drives, if needed
    loadSlots();
 
-   //Prepare autoload if drive A is loaded
-   imageName = strdup(CPC.drvA_file.c_str());
-   foundAutoload = cap32ext_autoload(imageName);
-   free(imageName);
-
-   if (foundAutoload != NULL) {
-      args.autocmd += replaceCap32Keys(foundAutoload);
-      args.autocmd += "\n";
-   }
-
-   // Fill the buffer with autocmd if provided and give enough time to CPC boot
-   cap32ext_stringToEvents(args.autocmd, CPC.boot_time);
-
 // ----------------------------------------------------------------------------
 
    update_timings();
@@ -577,15 +564,23 @@ void cap32ext_loadCPCDefaults() {
 }
 
 char *cap32ext_autoload(char *imageName) {
+   int cpc_image;
    int nFiles = 0;
    int index, cur_name_id, first_bas, first_spc, first_bin;
-   bool found;
+   bool found = false;
    static char buffer[200];
    char *retVal = NULL;
 
    cpcfs_init();
+   parse_def_file("cpcfs/cpmdisks.def");
    //TODO: FMS - Open image will not work if disk image IS compressed
-   if (open_image(imageName) == 0) {
+   cpc_image = open_image(imageName, 1);
+   if (cpc_image != 0) {
+       //Try to read with default dpb
+       cpcfs_setDataAsDefaultDPB();
+       cpc_image = open_image(imageName, 0);
+   }
+   if (cpc_image == 0) {
       nFiles = cpcfs_getNfiles();
       first_bas = first_spc = first_bin = -1;
       for (index = 0; index < nFiles; index++) {
@@ -612,6 +607,10 @@ char *cap32ext_autoload(char *imageName) {
       
          sprintf(buffer, "RUN\"%s", cpcfs_fileName(cur_name_id));
          retVal = buffer;
+      } else {
+          //Let's suppose these are |CPM
+          sprintf(buffer, "|CPM");
+          retVal = buffer;
       };
       close_image();
    }
@@ -656,6 +655,32 @@ renderercallback cap32ext_setrenderercallback(renderercallback cb) {
    renderercallback oldRendercb = rendercb;
    rendercb = cb;
    return oldRendercb;
+}
+
+int cap32ext_fileload(std::string fileName, int drive) {
+    int load;
+    char *foundAutoload, *internal_filename;
+    std::string autocmd;
+
+    CPC.drvA_file = fileName;
+    load = file_load(CPC.drvA_file, DSK_A);
+
+    if (load != 0) return load;
+
+    //Try to autoload
+    //Prepare autoload if drive A is loaded
+    internal_filename = strdup(fileName.c_str());
+    foundAutoload = cap32ext_autoload(internal_filename);
+    free(internal_filename);
+
+    if (foundAutoload != NULL) {
+        autocmd = replaceCap32Keys(foundAutoload);
+        autocmd += "\n";
+
+        // Fill the buffer with autocmd if provided and give enough time to CPC boot
+        cap32ext_stringToEvents(autocmd, CPC.boot_time);
+    }
+    return load;
 }
 
 #ifdef _ANDROID_

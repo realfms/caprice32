@@ -19,6 +19,7 @@ LOCAL_SRC_FILES := \
 	$(LOCAL_PATH)/cpcfs/src/fs.c \
 	$(LOCAL_PATH)/cpcfs/src/tools.c \
 	$(LOCAL_PATH)/cpcfs/src/match.c \
+	$(LOCAL_PATH)/cpcfs/src/readdef.c \
 	$(LOCAL_PATH)/cpcfs/src/cpcfs.c)
 
 LOCAL_CFLAGS += \

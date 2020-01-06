@@ -58,6 +58,7 @@ void cap32ext_cpcresume();
 void cap32ext_cpcreset(bool bolMF2Reset);
 void cap32ext_cpchardreset();
 void cap32ext_cpcvideoreset();
+int cap32ext_fileload(std::string fileName, int drive);
 
 #ifdef __cplusplus
 }

@@ -22,10 +22,12 @@
  *******/
 
 void close_image();
-int  open_image(char *name);
+int  open_image(char *name, int autodetect);
 void cpcfs_init();
 void cpcfs_finish();
 int cpcfs_getNfiles();
 char *cpcfs_fileName(int nFile);
+void  parse_def_file(char *Filename);
+void cpcfs_setDataAsDefaultDPB();
 
 #endif
