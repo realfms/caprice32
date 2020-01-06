@@ -8,13 +8,13 @@ int main(int argc, char **argv)
   cap32ext_loadCPCDefaults();
 
   CPC.model = 0;
-  CPC.scr_style = 1;
+  CPC.scr_style = 7;
   CPC.scr_fs_width = 800;
   CPC.scr_fs_height = 600;
   CPC.scr_fs_bpp = 32;
   CPC.scr_tube = false;
   CPC.scr_fps = false;
-  CPC.drvA_file = "disk/BatmanForever.dsk";
+  //CPC.drvA_file = "disk/BatmanForever.dsk";
   CPC.kbd_layout = "keymap_es_linux.map";
   CPC.keyboard = 2;
   cap32ext_checFinalConfig();

@@ -199,7 +199,7 @@ SDL_Surface* half_init(video_plugin* t,int w,int h, int bpp,bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, CPC_VISIBLE_SCR_WIDTH, CPC_VISIBLE_SCR_HEIGHT);
@@ -320,7 +320,7 @@ SDL_Surface* double_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, CPC_VISIBLE_SCR_WIDTH*2, CPC_VISIBLE_SCR_HEIGHT*2);
@@ -700,7 +700,7 @@ SDL_Surface* seagle_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -813,7 +813,7 @@ SDL_Surface* scale2x_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -1089,7 +1089,7 @@ SDL_Surface* ascale2x_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -1203,7 +1203,7 @@ SDL_Surface* tv2x_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -1312,7 +1312,7 @@ SDL_Surface* swbilin_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -1468,7 +1468,7 @@ SDL_Surface* swbicub_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
@@ -1586,7 +1586,7 @@ SDL_Surface* dotmat_init(video_plugin* t,int w,int h, int bpp, bool fs)
 	window = SDL_CreateWindow("Caprice32 " VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, (fs?SDL_WINDOW_FULLSCREEN_DESKTOP:0));
 	if (window == NULL)
 		return nullptr;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return nullptr;
 	CAP32_SDL2_PREPARE_SURFACE_TEXTURE(bpp, w, h);
